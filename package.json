@@ -1,0 +1,26 @@
+{
+  "name": "object_counter",
+  "version": "1.0.0",
+  "description": "Diploma",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kkeroo/object_counter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kkeroo/object_counter/issues"
+  },
+  "homepage": "https://github.com/kkeroo/object_counter#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "nodemon": "^2.0.16"
+  },
+  "proxy": "http://localhost:4000"
+}
