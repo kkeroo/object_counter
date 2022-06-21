@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import slika from './slika4.jpeg';
+import slika from './slika.jpg';
 import './App.css';
 import * as markerjs2 from 'markerjs2';
 import React, { Component } from 'react';
@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
 
 class App extends Component {
   constructor(props){
@@ -29,7 +30,6 @@ class App extends Component {
       this.markerArea.zoomSteps = [1, 1.5, 2, 2.5, 3];
       this.markerArea.uiStyleSettings.zoomButtonVisible = true;
       this.markerArea.settings.defaultStrokeWidth = 1;
-      this.markerArea.settings.newFreehandMarkerOnPointerUp = true;
       //this.markerArea.settings.displayMode = 'popup';
 
       // attach an event handler to assign annotated image back to our image element
@@ -66,6 +66,13 @@ class App extends Component {
         <Navbar bg="dark" expand="lg" variant="dark">
           <Container>
             <Navbar.Brand>Object Counter</Navbar.Brand>
+            <Nav>
+              <Nav.Link href="#">Load dataset</Nav.Link>
+              <Nav.Link href="#1">Save dataset</Nav.Link>
+              <Nav.Link href="#3">Load model</Nav.Link>
+              <Nav.Link href="#4">Train</Nav.Link>
+              <Nav.Link href="#5">Predict</Nav.Link>
+            </Nav>
           </Container>
         </Navbar>
         <Container className="mt-3">
