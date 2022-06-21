@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import slika from './slika.jpg';
 import './App.css';
 import * as markerjs2 from 'markerjs2';
@@ -7,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Navbar from './components/Navbar';
+import LoadDataset from './components/LoadDataset';
 
 class App extends Component {
   constructor(props){
@@ -59,28 +59,35 @@ class App extends Component {
     this.markerArea.startRenderAndClose();
   }
 
-  render() {
-    return (
-      <div className="App">
-        <Navbar></Navbar>
-        <Container className="mt-3">
-          <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()}>Start</Button>
-          <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }}>Rectangle</Button>
-          <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }}>Ellipse</Button>
-          <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }}>Zoom in</Button>
-          <Button className="btn-danger" onClick={() => { this.finishEditing(); }}>Finish</Button>
-        </Container>
-        <div className="img-container">
-          <img ref={this.imgRef}
-            className="slika"
-            src={slika}
-            alt="sample"
-            onWheel={(e) => {this.zoom(e)}}
-          />
-        </div>
+  render(){
+    return(
+      <div>
+        <LoadDataset></LoadDataset>
       </div>
-    );
+    )
   }
+  // render() {
+  //   return (
+  //     <div className="App">
+  //       <Navbar></Navbar>
+  //       <Container className="mt-3">
+  //         <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()}>Start</Button>
+  //         <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }}>Rectangle</Button>
+  //         <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }}>Ellipse</Button>
+  //         <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }}>Zoom in</Button>
+  //         <Button className="btn-danger" onClick={() => { this.finishEditing(); }}>Finish</Button>
+  //       </Container>
+  //       <div className="img-container">
+  //         <img ref={this.imgRef}
+  //           className="slika"
+  //           src={slika}
+  //           alt="sample"
+  //           onWheel={(e) => {this.zoom(e)}}
+  //         />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 }
 
 export default App;
