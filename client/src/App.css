@@ -28,6 +28,17 @@
   color: #61dafb;
 }
 
+.slika {
+  max-width: 70%;
+  object-fit: contain;
+}
+
+.img-container {
+  margin-top: 30px;
+  left:auto;
+  right: auto;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
