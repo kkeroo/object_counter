@@ -6,8 +6,7 @@ import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
+import Navbar from './components/Navbar';
 
 class App extends Component {
   constructor(props){
@@ -63,18 +62,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Navbar bg="dark" expand="lg" variant="dark">
-          <Container>
-            <Navbar.Brand>Object Counter</Navbar.Brand>
-            <Nav>
-              <Nav.Link href="#">Load dataset</Nav.Link>
-              <Nav.Link href="#1">Save dataset</Nav.Link>
-              <Nav.Link href="#3">Load model</Nav.Link>
-              <Nav.Link href="#4">Train</Nav.Link>
-              <Nav.Link href="#5">Predict</Nav.Link>
-            </Nav>
-          </Container>
-        </Navbar>
+        <Navbar></Navbar>
         <Container className="mt-3">
           <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()}>Start</Button>
           <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }}>Rectangle</Button>
