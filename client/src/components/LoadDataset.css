@@ -1,0 +1,13 @@
+.preview-image {
+    width: 100%;
+}
+
+.images-list {
+    max-height: 500px;
+    overflow:scroll;
+    border: 2px solid gray;
+}
+
+.LoadDataset {
+    background-color: #EEE;
+}
