@@ -10,25 +10,25 @@ import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import Alert from 'react-bootstrap/Alert';
 
-const LoadDataset = () => {
+const LoadDataset = (props) => {
     const [images, setImages] = useState(new Array());
     const [previewImage, setPreviewImage] = useState("");
     
-    const imageSelected = (event) => { 
-        //console.log(event.target.files);
-        for (let file of event.target.files) {
-            setImages(current => [...current, file]);
-        }
-    };
+    // const imageSelected = (event) => { 
+    //     //console.log(event.target.files);
+    //     for (let file of event.target.files) {
+    //         setImages(current => [...current, file]);
+    //     }
+    // };
 
-    const previewSelectedImage = (image) => {
-        setPreviewImage(image);
-    }
+    // const previewSelectedImage = (image) => {
+    //     setPreviewImage(image);
+    // }
 
-    const deleteDataset = () => {
-        setImages(new Array());
-        setPreviewImage("");
-    };
+    // const deleteDataset = () => {
+    //     setImages(new Array());
+    //     setPreviewImage("");
+    // };
 
     return (
         <div className="LoadDataset">
@@ -41,7 +41,7 @@ const LoadDataset = () => {
                             <Col>
                                 <Form className='file-input me-3 mt-1'>
                                     <Form.Group controlId="formFile" className="mb-2">
-                                        <Form.Control type="file" multiple accept=".jpg" onChange={(e) => {imageSelected(e);}}/>
+                                        <Form.Control type="file" multiple accept=".jpg" onChange={(e) => {props.onImageSelected(e);}}/>
                                     </Form.Group>
                                 </Form>
                             </Col>
@@ -53,20 +53,20 @@ const LoadDataset = () => {
                     </Col>
                     <Col lg="1"></Col>
                 </Row>
-                <Row>
-                    <Col sm="2" lg="2"></Col>
-                    <Col sm="6" lg="6">
-                        <img className="preview-image" src={previewImage != "" ? URL.createObjectURL(previewImage) : ""}/>
+                <Row className="image-preview-container">
+                    <Col sm="2" lg="2" className="pt-3"></Col>
+                    <Col sm="6" lg="6" className="pt-3">
+                        <img className="preview-image" src={props.previewImage != "" ? URL.createObjectURL(props.previewImage) : ""}/>
                     </Col>
-                    <Col sm="4" lg="4" className="images-list-container">
+                    <Col sm="4" lg="4" className="pt-3 images-list-container">
                         <Stack direction='horizontal' gap="3">
                             <h5>Uploaded images</h5>
-                            <Button size="sm" className="btn-danger mb-2 ms-auto" onClick={() => {deleteDataset();}}>Delete dataset</Button>
+                            <Button size="sm" className="btn-danger mb-2 ms-auto" onClick={() => {props.onDeleteDataset();}}>Delete dataset</Button>
                         </Stack>
                         <ListGroup as="ul" className="images-list">
                             {
-                                images.map((image) => (
-                                    <ListGroup.Item action href={image.name} id={image.name} as="li" onClick={() => {previewSelectedImage(image)}}>{image.name}</ListGroup.Item>
+                                props.images.map((image) => (
+                                    <ListGroup.Item action href={image.name} id={image.name} as="li" onClick={() => {props.onPreviewSelectedImage(image)}}>{image.name}</ListGroup.Item>
                                 ))
                             }
                         </ListGroup>

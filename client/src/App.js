@@ -1,18 +1,33 @@
-import slika from './slika.jpg';
+import slika from './slika.jpg'
 import './App.css';
 import * as markerjs2 from 'markerjs2';
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
-import Navbar from './components/Navbar';
 import LoadDataset from './components/LoadDataset';
 
 class App extends Component {
   constructor(props){
     super(props);
+    this.state = {images: new Array(), previewImage: "",}
     this.imgRef = React.createRef();
     this.markerArea = null;
+  }
+
+  handleImageSelected = (event) => { 
+    for (let file of event.target.files) {
+        console.log(this.state);
+        this.setState(prevState => ({images: [...prevState.images, file], previewImage: prevState.previewImage}));
+    }
+  };
+
+  handlePreviewSelectedImage = (image) => {
+    this.setState(prevState => ({images: prevState.images, previewImage: image}));
+  }
+
+  handleDeleteDataset = () => {
+    this.setState(prevState => ({images: new Array(), previewImage: ""}));
   }
 
   showMarkerArea() {
@@ -62,7 +77,12 @@ class App extends Component {
   render(){
     return(
       <div>
-        <LoadDataset></LoadDataset>
+        <LoadDataset onImageSelected={this.handleImageSelected} 
+          onPreviewSelectedImage={this.handlePreviewSelectedImage}
+          onDeleteDataset={this.handleDeleteDataset}
+          images={this.state.images} 
+          previewImage={this.state.previewImage}>
+        </LoadDataset>
       </div>
     )
   }
