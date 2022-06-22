@@ -8,7 +8,6 @@ import Col from 'react-bootstrap/Col';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
-import Alert from 'react-bootstrap/Alert';
 
 const LoadDataset = (props) => {
     const [images, setImages] = useState(new Array());

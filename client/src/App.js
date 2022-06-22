@@ -17,8 +17,14 @@ class App extends Component {
 
   handleImageSelected = (event) => { 
     for (let file of event.target.files) {
-        console.log(this.state);
-        this.setState(prevState => ({images: [...prevState.images, file], previewImage: prevState.previewImage}));
+        if (this.state.images.length == 0){
+          // we dont yet have an image in our dataset
+          // so we set the preview image to the first one
+          this.setState(prevState => ({images: [...prevState.images, file], previewImage: event.target.files[0]}));
+        }
+        else{
+          this.setState(prevState => ({images: [...prevState.images, file], previewImage: prevState.previewImage}));
+        }
     }
   };
 
