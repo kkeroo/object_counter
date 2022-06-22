@@ -20,14 +20,14 @@ const LoadDataset = () => {
         }
     };
 
-    const izpis = () => {
-        console.log(images);
-    };
-
     const previewSelectedImage = (image) => {
         setPreviewImage(image);
-        console.log(image);
     }
+
+    const deleteDataset = () => {
+        setImages(new Array());
+        setPreviewImage("");
+    };
 
     return (
         <div className="LoadDataset">
@@ -38,16 +38,15 @@ const LoadDataset = () => {
                         <Form.Control type="file" multiple accept=".jpg" onChange={(e) => {imageSelected(e);}}/>
                     </Form.Group>
                 </Form>
-                <button onClick={izpis()}>Izpisi</button>
                 <Row>
                     <Col sm="2" lg="2"></Col>
                     <Col sm="6" lg="6">
-                        <img alt="not found" className="preview-image" src={previewImage != "" ? URL.createObjectURL(previewImage) : ""}/>
+                        <img className="preview-image" src={previewImage != "" ? URL.createObjectURL(previewImage) : ""}/>
                     </Col>
                     <Col sm="4" lg="4" className="images-list-container">
                         <Stack direction='horizontal' gap="3" className="s">
                             <h5>Uploaded images</h5>
-                            <Button size="sm" className="btn-danger mb-2 ms-auto">Delete dataset</Button>
+                            <Button size="sm" className="btn-danger mb-2 ms-auto" onClick={() => {deleteDataset();}}>Delete dataset</Button>
                         </Stack>
                         <ListGroup as="ul" className="images-list">
                             {
