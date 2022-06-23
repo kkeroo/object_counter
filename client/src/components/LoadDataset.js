@@ -1,6 +1,5 @@
 import './LoadDataset.css';
 import React, { useState } from "react";
-import Navbar from './Navbar';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
@@ -31,7 +30,6 @@ const LoadDataset = (props) => {
 
     return (
         <div className="LoadDataset">
-            <Navbar></Navbar>
             <Container className="mt-3">
                 <Row className="mb-4 mt-4">
                     <Col lg="1"></Col>

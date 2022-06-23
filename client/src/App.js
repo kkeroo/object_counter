@@ -6,11 +6,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import LoadDataset from './components/LoadDataset';
+import Navigation from './components/Navbar';
 
 class App extends Component {
   constructor(props){
     super(props);
-    this.state = {images: new Array(), previewImage: "",}
+    // page is name of the page (link in navbar), can be: load_dataset, annotate, save, load_model, train, predict
+    this.state = {
+      images: new Array(),
+      previewImage: "",
+      page: "load_dataset"
+    };
     this.imgRef = React.createRef();
     this.markerArea = null;
   }
@@ -36,6 +42,14 @@ class App extends Component {
     this.setState(prevState => ({images: new Array(), previewImage: ""}));
   }
 
+  handleLoadDatasetPage = () => {
+    this.setState(prevState => ({...prevState, page: "load_dataset"}));
+  }
+
+  handleAnnotatePage = () => {
+    this.setState(prevState => ({...prevState, page: "annotate"}));
+  }
+
   showMarkerArea() {
     if (this.imgRef.current !== null) {
       // create a marker.js MarkerArea
@@ -57,7 +71,7 @@ class App extends Component {
         //if (this.imgRef.current) {
         //  this.imgRef.current.src = event.dataUrl;
         //}
-        console.log(event);
+        // console.log(event);
         let myState = event.state;
         this.showMarkerArea();
         this.markerArea.restoreState(myState);
@@ -80,18 +94,72 @@ class App extends Component {
     this.markerArea.startRenderAndClose();
   }
 
+  pageDisplay = () => {
+    console.log(this.state.page);
+    switch (this.state.page) {
+      case "load_dataset":
+        {
+          return (<LoadDataset onImageSelected={this.handleImageSelected} 
+            onPreviewSelectedImage={this.handlePreviewSelectedImage}
+            onDeleteDataset={this.handleDeleteDataset}
+            images={this.state.images} 
+            previewImage={this.state.previewImage}>
+          </LoadDataset> )
+          break;
+        }
+      case "annotate":
+        {
+          return (
+                <div className="App">
+                  <Container className="mt-3">
+                    <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()}>Start</Button>
+                    <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }}>Rectangle</Button>
+                    <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }}>Ellipse</Button>
+                    <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }}>Zoom in</Button>
+                    <Button className="btn-danger" onClick={() => { this.finishEditing(); }}>Finish</Button>
+                  </Container>
+                  <div className="img-container">
+                    <img ref={this.imgRef}
+                      className="slika"
+                      src={slika}
+                      alt="sample"
+                      onWheel={(e) => {this.zoom(e)}}
+                    />
+                  </div>
+                </div>
+              );
+          break;
+        }
+    
+      default:
+        break;
+    }
+  }
+
   render(){
     return(
       <div>
-        <LoadDataset onImageSelected={this.handleImageSelected} 
-          onPreviewSelectedImage={this.handlePreviewSelectedImage}
-          onDeleteDataset={this.handleDeleteDataset}
-          images={this.state.images} 
-          previewImage={this.state.previewImage}>
-        </LoadDataset>
+        <Navigation
+          onLoadDataset={this.handleLoadDatasetPage}
+          onAnnotate={this.handleAnnotatePage}>
+        </Navigation>
+        {this.pageDisplay()}
       </div>
     )
   }
+
+  // render(){
+  //   return(
+  //     <div>
+  //       <LoadDataset onImageSelected={this.handleImageSelected} 
+  //         onPreviewSelectedImage={this.handlePreviewSelectedImage}
+  //         onDeleteDataset={this.handleDeleteDataset}
+  //         images={this.state.images} 
+  //         previewImage={this.state.previewImage}>
+  //       </LoadDataset>
+  //     </div>
+  //   )
+  // }
   // render() {
   //   return (
   //     <div className="App">

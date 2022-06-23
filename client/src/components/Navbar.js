@@ -14,12 +14,12 @@ function Navigation(props){
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav justify-content-end">
                     <Nav className="ms-auto">
-                        <Nav.Link href="#">Load dataset</Nav.Link>
-                        <Nav.Link href="#1">Annotate</Nav.Link>
-                        <Nav.Link href="#2">Save dataset</Nav.Link>
-                        <Nav.Link href="#3">Load model</Nav.Link>
-                        <Nav.Link href="#4">Train</Nav.Link>
-                        <Nav.Link href="#5">Predict</Nav.Link>
+                        <Nav.Link href="#" onClick={() => {props.onLoadDataset()}}>Load dataset</Nav.Link>
+                        <Nav.Link href="#1" onClick={() => {props.onAnnotate()}}>Annotate</Nav.Link>
+                        <Nav.Link href="#2" onClick={() => {props.onSaveDataset()}}>Save dataset</Nav.Link>
+                        <Nav.Link href="#3" onClick={() => {props.onLoadModel()}}>Load model</Nav.Link>
+                        <Nav.Link href="#4" onClick={() => {props.onTrain()}}>Train</Nav.Link>
+                        <Nav.Link href="#5" onClick={() => {props.onPredict()}}>Predict</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>
