@@ -7,6 +7,7 @@ import Col from 'react-bootstrap/Col';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
+import ImageList from './ImageList';
 
 const LoadDataset = (props) => {
     const [images, setImages] = useState(new Array());
@@ -60,13 +61,18 @@ const LoadDataset = (props) => {
                             <h5>Uploaded images</h5>
                             <Button size="sm" className="btn-danger mb-2 ms-auto" onClick={() => {props.onDeleteDataset();}}>Delete dataset</Button>
                         </Stack>
-                        <ListGroup as="ul" className="images-list">
+                        <ImageList
+                            images={props.images}
+                            onPreviewSelectedImage={props.onPreviewSelectedImage}
+                        >
+                        </ImageList>
+                        {/* <ListGroup as="ul" className="images-list">
                             {
                                 props.images.map((image) => (
                                     <ListGroup.Item action href={image.name} id={image.name} as="li" onClick={() => {props.onPreviewSelectedImage(image)}}>{image.name}</ListGroup.Item>
                                 ))
                             }
-                        </ListGroup>
+                        </ListGroup> */}
                     </Col>
                 </Row>
             </Container>
