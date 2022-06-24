@@ -10,24 +10,6 @@ import Stack from 'react-bootstrap/Stack';
 import ImageList from './ImageList';
 
 const LoadDataset = (props) => {
-    const [images, setImages] = useState(new Array());
-    const [previewImage, setPreviewImage] = useState("");
-    
-    // const imageSelected = (event) => { 
-    //     //console.log(event.target.files);
-    //     for (let file of event.target.files) {
-    //         setImages(current => [...current, file]);
-    //     }
-    // };
-
-    // const previewSelectedImage = (image) => {
-    //     setPreviewImage(image);
-    // }
-
-    // const deleteDataset = () => {
-    //     setImages(new Array());
-    //     setPreviewImage("");
-    // };
 
     return (
         <div className="LoadDataset">
