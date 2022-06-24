@@ -7,6 +7,9 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import LoadDataset from './components/LoadDataset';
 import Navigation from './components/Navbar';
+import ImageList from './components/ImageList';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 class App extends Component {
   constructor(props){
@@ -112,20 +115,37 @@ class App extends Component {
           return (
                 <div className="App">
                   <Container className="mt-3">
-                    <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()}>Start</Button>
-                    <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }}>Rectangle</Button>
-                    <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }}>Ellipse</Button>
-                    <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }}>Zoom in</Button>
-                    <Button className="btn-danger" onClick={() => { this.finishEditing(); }}>Finish</Button>
+                    <Row>
+                      <Col>
+                        <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()}>Start</Button>
+                        <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }}>Rectangle</Button>
+                        <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }}>Ellipse</Button>
+                        <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }}>Zoom in</Button>
+                        <Button className="btn-danger" onClick={() => { this.finishEditing(); }}>Finish</Button>
+                      </Col>
+                    </Row>
                   </Container>
-                  <div className="img-container">
-                    <img ref={this.imgRef}
-                      className="slika"
-                      src={slika}
-                      alt="sample"
-                      onWheel={(e) => {this.zoom(e)}}
-                    />
-                  </div>
+                  <Row>
+                    <Col lg="10">
+                      <div className="img-container">
+                        <img ref={this.imgRef}
+                          className="slika"
+                          src={slika}
+                          alt="sample"
+                          onWheel={(e) => {this.zoom(e)}}
+                        />
+                      </div>
+                    </Col>
+                    <Col lg="2" className="mt-5">
+                      <div className="me-5">
+                      <ImageList
+                        images={this.state.images}
+                        onPreviewSelectedImage={this.handlePreviewSelectedImage}
+                      >
+                      </ImageList>
+                      </div>
+                    </Col>
+                  </Row>
                 </div>
               );
           break;
