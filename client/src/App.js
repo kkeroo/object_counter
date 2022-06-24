@@ -16,11 +16,13 @@ class App extends Component {
     super(props);
     // page is name of the page (link in navbar), can be: load_dataset, annotate, save, load_model, train, predict
     this.state = {
-      images: new Array(),
-      previewImage: "",
-      page: "load_dataset",
-      currImage: "",
-      editing: false
+      images: new Array(), // all uploaded images
+      previewImage: "", // current preview image in Load dataset page
+      page: "load_dataset", // current page
+      currImage: "", // current image for annotation
+      editing: false, // are we annotating?
+      annotatedImages: new Array() // all data (image + annotations)
+
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -59,6 +61,23 @@ class App extends Component {
     this.setState(prevState => ({...prevState, page: "annotate"}));
   }
 
+  updateAnnotatedImages = (currentState) => {
+    const newAnnotatedImages = this.state.annotatedImages;
+    const currImage = this.state.currImage;
+
+    for (let i = 0; i < newAnnotatedImages.length; i++){
+      if (newAnnotatedImages[i].image == currImage){
+        newAnnotatedImages[i].state = currentState;
+        this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
+        return;
+      }
+    }
+
+    // image is not yet in annotatedImages...
+    newAnnotatedImages.push({image: currImage, state: currentState});
+    this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
+  }
+
   showMarkerArea() {
     if (this.imgRef.current !== null) {
       // create a marker.js MarkerArea
@@ -76,15 +95,10 @@ class App extends Component {
       //this.markerArea.settings.displayMode = 'popup';
 
       // attach an event handler to assign annotated image back to our image element
-      // this.markerArea.addEventListener('render', event => {
-      //   if (this.imgRef.current) {
-      //    this.imgRef.current.src = event.dataUrl;
-      //   }
-      //   console.log(event);
-      //   let myState = event.state;
-      //   this.showMarkerArea();
-      //   this.markerArea.restoreState(myState);
-      // });
+      this.markerArea.addEventListener('render', event => {
+        let myState = event.state;
+        this.updateAnnotatedImages(myState);
+      });
 
       // launch marker.js
       this.setState(prevState => ({...prevState, editing: true}));
