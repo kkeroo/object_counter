@@ -19,7 +19,7 @@ class App extends Component {
       images: new Array(), // all uploaded images
       previewImage: "", // current preview image in Load dataset page
       page: "load_dataset", // current page
-      currImage: "", // current image for annotation
+      currImage: { image: "", file: null }, // current image for annotation
       editing: false, // are we annotating?
       annotatedImages: new Array() // all data (image + annotations)
 
@@ -46,7 +46,7 @@ class App extends Component {
   }
 
   handleAnnotateSelectedImage = (image) => {
-    this.setState(prevState => ({...prevState, currImage: URL.createObjectURL(image)}));
+    this.setState(prevState => ({...prevState, currImage: { image:URL.createObjectURL(image), file: image } }));
   }
 
   handleDeleteDataset = () => {
@@ -66,7 +66,7 @@ class App extends Component {
     const currImage = this.state.currImage;
 
     for (let i = 0; i < newAnnotatedImages.length; i++){
-      if (newAnnotatedImages[i].image == currImage){
+      if (newAnnotatedImages[i].image.file.name === currImage.file.name){
         newAnnotatedImages[i].state = currentState;
         this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
         return;
@@ -152,7 +152,7 @@ class App extends Component {
                       <div className="img-container">
                         <img ref={this.imgRef}
                           className="slika"
-                          src={this.state.currImage}
+                          src={this.state.currImage.image}
                           alt="sample"
                           onWheel={(e) => {this.zoom(e)}}
                         />
@@ -189,41 +189,7 @@ class App extends Component {
       </div>
     )
   }
-
-  // render(){
-  //   return(
-  //     <div>
-  //       <LoadDataset onImageSelected={this.handleImageSelected} 
-  //         onPreviewSelectedImage={this.handlePreviewSelectedImage}
-  //         onDeleteDataset={this.handleDeleteDataset}
-  //         images={this.state.images} 
-  //         previewImage={this.state.previewImage}>
-  //       </LoadDataset>
-  //     </div>
-  //   )
-  // }
-  // render() {
-  //   return (
-  //     <div className="App">
-  //       <Navbar></Navbar>
-  //       <Container className="mt-3">
-  //         <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()}>Start</Button>
-  //         <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }}>Rectangle</Button>
-  //         <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }}>Ellipse</Button>
-  //         <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }}>Zoom in</Button>
-  //         <Button className="btn-danger" onClick={() => { this.finishEditing(); }}>Finish</Button>
-  //       </Container>
-  //       <div className="img-container">
-  //         <img ref={this.imgRef}
-  //           className="slika"
-  //           src={slika}
-  //           alt="sample"
-  //           onWheel={(e) => {this.zoom(e)}}
-  //         />
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  
 }
 
 export default App;
