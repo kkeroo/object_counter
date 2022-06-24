@@ -18,7 +18,9 @@ class App extends Component {
     this.state = {
       images: new Array(),
       previewImage: "",
-      page: "load_dataset"
+      page: "load_dataset",
+      currImage: "",
+      editing: false
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -39,6 +41,10 @@ class App extends Component {
 
   handlePreviewSelectedImage = (image) => {
     this.setState(prevState => ({images: prevState.images, previewImage: image}));
+  }
+
+  handleAnnotateSelectedImage = (image) => {
+    this.setState(prevState => ({...prevState, currImage: URL.createObjectURL(image)}));
   }
 
   handleDeleteDataset = () => {
@@ -70,17 +76,18 @@ class App extends Component {
       //this.markerArea.settings.displayMode = 'popup';
 
       // attach an event handler to assign annotated image back to our image element
-      this.markerArea.addEventListener('render', event => {
-        //if (this.imgRef.current) {
-        //  this.imgRef.current.src = event.dataUrl;
-        //}
-        // console.log(event);
-        let myState = event.state;
-        this.showMarkerArea();
-        this.markerArea.restoreState(myState);
-      });
+      // this.markerArea.addEventListener('render', event => {
+      //   if (this.imgRef.current) {
+      //    this.imgRef.current.src = event.dataUrl;
+      //   }
+      //   console.log(event);
+      //   let myState = event.state;
+      //   this.showMarkerArea();
+      //   this.markerArea.restoreState(myState);
+      // });
 
       // launch marker.js
+      this.setState(prevState => ({...prevState, editing: true}));
       this.markerArea.show();
     }
   }
@@ -95,6 +102,7 @@ class App extends Component {
 
   finishEditing() {
     this.markerArea.startRenderAndClose();
+    this.setState(prevState => ({...prevState, editing: false}));
   }
 
   pageDisplay = () => {
@@ -117,11 +125,11 @@ class App extends Component {
                   <Container className="mt-3">
                     <Row>
                       <Col>
-                        <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()}>Start</Button>
+                        <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()} disabled={this.state.editing}>Start</Button>
                         <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }}>Rectangle</Button>
                         <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }}>Ellipse</Button>
                         <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }}>Zoom in</Button>
-                        <Button className="btn-danger" onClick={() => { this.finishEditing(); }}>Finish</Button>
+                        <Button className="btn-danger" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
                       </Col>
                     </Row>
                   </Container>
@@ -130,7 +138,7 @@ class App extends Component {
                       <div className="img-container">
                         <img ref={this.imgRef}
                           className="slika"
-                          src={slika}
+                          src={this.state.currImage}
                           alt="sample"
                           onWheel={(e) => {this.zoom(e)}}
                         />
@@ -140,7 +148,7 @@ class App extends Component {
                       <div className="me-5">
                       <ImageList
                         images={this.state.images}
-                        onPreviewSelectedImage={this.handlePreviewSelectedImage}
+                        onPreviewSelectedImage={this.handleAnnotateSelectedImage}
                       >
                       </ImageList>
                       </div>
