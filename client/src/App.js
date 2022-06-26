@@ -24,11 +24,19 @@ class App extends Component {
       page: "load_dataset", // current page
       currImage: { image: "", file: null }, // current image for annotation
       editing: false, // are we annotating?
-      annotatedImages: new Array() // all data (image + annotations)
-
+      annotatedImages: new Array(), // all data (image + annotations)
+      filename: "",
+      filenameErrorMessage: ""
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
+  }
+
+  fileNameValidation = (filename) => {
+    if (filename == '') return false;
+    let re = /^[\w-]+$/;
+    if (re.test(filename)) return true;
+    return false;
   }
 
   handleImageSelected = (event) => { 
@@ -66,6 +74,19 @@ class App extends Component {
 
   handleSaveDatasetPage = () => {
     this.setState(prevState => ({ ...prevState, page: "save_dataset" }));
+  }
+
+  handleFileNameEnter = (filename) => {
+    this.setState(prevState => ({ ...prevState, filename: filename }));
+  }
+
+  handleSaveDataset = () => {
+    if (!this.fileNameValidation(this.state.filename)){
+      this.setState(prevState => ({ ...prevState, filenameErrorMessage: "Please enter valid file name." }));
+    }
+    else{
+      this.setState(prevState => ({ ...prevState, filenameErrorMessage: "" }));
+    }
   }
 
   updateAnnotatedImages = (currentState) => {
@@ -152,7 +173,10 @@ class App extends Component {
           return (
             <SaveDataset
               show={this.state.page === "save_dataset"}
-              handleClose={this.handleAnnotatePage}
+              onClose={this.handleAnnotatePage}
+              onFileNameEnter={this.handleFileNameEnter}
+              errorMessage={this.state.filenameErrorMessage}
+              onSaveDataset={this.handleSaveDataset}
             ></SaveDataset>
           )
         }
