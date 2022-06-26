@@ -2,14 +2,17 @@ import slika from './slika.jpg'
 import './App.css';
 import * as markerjs2 from 'markerjs2';
 import React, { Component, useState } from 'react';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
-import LoadDataset from './components/LoadDataset';
-import Navigation from './components/Navbar';
-import ImageList from './components/ImageList';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+
+import ImageList from './components/ImageList';
+import LoadDataset from './components/LoadDataset';
+import Navigation from './components/Navbar';
+import SaveDataset from './components/SaveDataset';
 
 class App extends Component {
   constructor(props){
@@ -59,6 +62,10 @@ class App extends Component {
 
   handleAnnotatePage = () => {
     this.setState(prevState => ({...prevState, page: "annotate"}));
+  }
+
+  handleSaveDatasetPage = () => {
+    this.setState(prevState => ({ ...prevState, page: "save_dataset" }));
   }
 
   updateAnnotatedImages = (currentState) => {
@@ -139,7 +146,12 @@ class App extends Component {
             images={this.state.images} 
             previewImage={this.state.previewImage}>
           </LoadDataset> )
-          break;
+        }
+      case "save_dataset":
+        {
+          return (
+            <SaveDataset></SaveDataset>
+          )
         }
       case "annotate":
         {
@@ -192,7 +204,9 @@ class App extends Component {
       <div>
         <Navigation
           onLoadDataset={this.handleLoadDatasetPage}
-          onAnnotate={this.handleAnnotatePage}>
+          onAnnotate={this.handleAnnotatePage}
+          onSaveDataset={this.handleSaveDatasetPage}
+        >
         </Navigation>
         {this.pageDisplay()}
       </div>
