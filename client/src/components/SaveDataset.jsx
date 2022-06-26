@@ -1,17 +1,26 @@
 import React, { useState } from "react";
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
-import Stack from 'react-bootstrap/Stack';
-import ImageList from './ImageList';
+import Modal from 'react-bootstrap/Modal';
 
 const SaveDataset = (props) => {
     return (
         <>
-        <h1>Save</h1>
+        <Modal show={props.show} onHide={props.handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Modal heading</Modal.Title>
+            </Modal.Header>
+        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Modal.Footer>
+            <Button variant="secondary" onClick={props.handleClose}>
+                Close
+            </Button>
+            <Button variant="primary" onClick={props.handleClose}>
+                Save Changes
+            </Button>
+        </Modal.Footer>
+        </Modal>
         </>
     )
 }

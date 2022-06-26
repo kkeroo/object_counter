@@ -150,7 +150,10 @@ class App extends Component {
       case "save_dataset":
         {
           return (
-            <SaveDataset></SaveDataset>
+            <SaveDataset
+              show={this.state.page === "save_dataset"}
+              handleClose={this.handleAnnotatePage}
+            ></SaveDataset>
           )
         }
       case "annotate":
