@@ -149,9 +149,9 @@ class App extends Component {
                     <Row>
                       <Col>
                         <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()} disabled={this.state.editing}>Start</Button>
-                        <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }}>Rectangle</Button>
-                        <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }}>Ellipse</Button>
-                        <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }}>Zoom in</Button>
+                        <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>Rectangle</Button>
+                        <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
+                        <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
                         <Button className="btn-danger" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
                       </Col>
                     </Row>
