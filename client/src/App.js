@@ -100,6 +100,15 @@ class App extends Component {
         this.updateAnnotatedImages(myState);
       });
 
+      this.markerArea.addEventListener('show', event => {
+        for (let i = 0; i < this.state.annotatedImages.length; i++){
+          if (this.state.currImage.file.name === this.state.annotatedImages[i].image.file.name){
+            console.log("že obstaja state");
+            this.markerArea.restoreState(this.state.annotatedImages[i].state);
+          }
+        }
+      });
+
       // launch marker.js
       this.setState(prevState => ({...prevState, editing: true}));
       this.markerArea.show();
@@ -189,7 +198,7 @@ class App extends Component {
       </div>
     )
   }
-  
+
 }
 
 export default App;
