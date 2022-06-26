@@ -209,6 +209,7 @@ class App extends Component {
           onLoadDataset={this.handleLoadDatasetPage}
           onAnnotate={this.handleAnnotatePage}
           onSaveDataset={this.handleSaveDatasetPage}
+          disableSaveDataset={this.state.annotatedImages.length == 0}
         >
         </Navigation>
         {this.pageDisplay()}
