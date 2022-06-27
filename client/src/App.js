@@ -2,6 +2,7 @@ import slika from './slika.jpg'
 import './App.css';
 import * as markerjs2 from 'markerjs2';
 import React, { Component, useState } from 'react';
+import { saveAs } from 'file-saver';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
@@ -86,6 +87,8 @@ class App extends Component {
     }
     else{
       this.setState(prevState => ({ ...prevState, filenameErrorMessage: "" }));
+      let blob = new Blob([JSON.stringify(this.state.annotatedImages)], {type: "text/plain;charset=utf-8"});
+      saveAs(blob, "test.txt");
     }
   }
 
