@@ -26,8 +26,9 @@ const LoadDataset = (props) => {
                                 </Form>
                             </Col>
                             <Col>
-                                <p className="" variant="light">Create an image dataset. Choose files to add them to the dataset. You can choose
-                                multiple files, multiple times.</p>
+                                <Button size="md" className="btn-success mt-1" onClick={() => {props.onUploadAnnotationsFile();}}>Upload annotations file</Button>
+                                {/* <p className="" variant="light">Create an image dataset. Choose files to add them to the dataset. You can choose
+                                multiple files, multiple times.</p> */}
                             </Col>
                         </Row>
                     </Col>
@@ -48,13 +49,6 @@ const LoadDataset = (props) => {
                             onPreviewSelectedImage={props.onPreviewSelectedImage}
                         >
                         </ImageList>
-                        {/* <ListGroup as="ul" className="images-list">
-                            {
-                                props.images.map((image) => (
-                                    <ListGroup.Item action href={image.name} id={image.name} as="li" onClick={() => {props.onPreviewSelectedImage(image)}}>{image.name}</ListGroup.Item>
-                                ))
-                            }
-                        </ListGroup> */}
                     </Col>
                 </Row>
             </Container>

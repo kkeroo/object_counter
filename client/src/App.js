@@ -102,6 +102,10 @@ class App extends Component {
     }
   }
 
+  handleUploadAnnotationsFile = () => {
+    console.log("");
+  }
+
   updateAnnotatedImages = (currentState) => {
     const newAnnotatedImages = this.state.annotatedImages;
     const currImage = this.state.currImage;
@@ -177,6 +181,7 @@ class App extends Component {
           return (<LoadDataset onImageSelected={this.handleImageSelected} 
             onPreviewSelectedImage={this.handlePreviewSelectedImage}
             onDeleteDataset={this.handleDeleteDataset}
+            onUploadAnnotationsFile={this.handleUploadAnnotationsFile}
             images={this.state.images} 
             previewImage={this.state.previewImage}>
           </LoadDataset> )
