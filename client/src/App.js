@@ -88,7 +88,8 @@ class App extends Component {
     else{
       this.setState(prevState => ({ ...prevState, filenameErrorMessage: "" }));
       let blob = new Blob([JSON.stringify(this.state.annotatedImages)], {type: "text/plain;charset=utf-8"});
-      saveAs(blob, "test.txt");
+      let fn = this.state.filename + ".txt";
+      saveAs(blob, fn);
     }
   }
 
