@@ -1,10 +1,8 @@
 import './LoadDataset.css';
-import React, { useState } from "react";
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import ImageList from './ImageList';
@@ -26,7 +24,8 @@ const LoadDataset = (props) => {
                                 </Form>
                             </Col>
                             <Col>
-                                <Button size="md" className="btn-success mt-1" onClick={() => {props.onUploadAnnotationsFile();}}>Upload annotations file</Button>
+                                {/* <Button size="md" className="btn-success mt-1" onClick={() => {props.onUploadAnnotationsFile();}}>Upload annotations file</Button> */}
+                                <Form.Control className="mt-1" type="file" accept=".txt" onChange={(e) => {props.onUploadAnnotationsFile(e);}}/>
                                 {/* <p className="" variant="light">Create an image dataset. Choose files to add them to the dataset. You can choose
                                 multiple files, multiple times.</p> */}
                             </Col>

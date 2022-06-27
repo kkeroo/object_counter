@@ -31,6 +31,7 @@ class App extends Component {
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
+    this.filereader = null;
   }
 
   fileNameValidation = (filename) => {
@@ -102,8 +103,17 @@ class App extends Component {
     }
   }
 
-  handleUploadAnnotationsFile = () => {
-    console.log("");
+  handleFileRead = e => {
+    const content = this.filereader.result;
+    let data = JSON.parse(content);
+    console.log(data);
+  }
+  
+  handleUploadAnnotationsFile = (e) => {
+    if (e.target.files[0] == undefined) return;
+    this.filereader = new FileReader();
+    this.filereader.onloadend = this.handleFileRead;
+    this.filereader.readAsText(e.target.files[0]);
   }
 
   updateAnnotatedImages = (currentState) => {
