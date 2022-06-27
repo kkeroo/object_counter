@@ -87,9 +87,18 @@ class App extends Component {
     }
     else{
       this.setState(prevState => ({ ...prevState, filenameErrorMessage: "" }));
-      let blob = new Blob([JSON.stringify(this.state.annotatedImages)], {type: "text/plain;charset=utf-8"});
+
+      let data = this.state.annotatedImages;
+      for (let i = 0; i < data.length; i++){
+        data[i].filename = data[i].image.file.name;
+      }
+      data = JSON.stringify(data);
+
+      let blob = new Blob([data], {type: "text/plain;charset=utf-8"});
       let fn = this.state.filename + ".txt";
       saveAs(blob, fn);
+
+      this.handleAnnotatePage();
     }
   }
 
