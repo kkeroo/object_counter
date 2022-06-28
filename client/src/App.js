@@ -9,7 +9,6 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
 
 import ImageList from './components/ImageList';
 import LoadDataset from './components/LoadDataset';
@@ -27,9 +26,10 @@ class App extends Component {
       currImage: { image: "", file: null }, // current image for annotation
       editing: false, // are we annotating?
       annotatedImages: new Array(), // all data (image + annotations)
-      filename: "",
-      filenameErrorMessage: "",
-      currentlyUploadingAnnotationsFile: false
+      filename: "", // file name of a annotations file, we want to download
+      filenameErrorMessage: "", // error message (eg. unvalid filename, contains . or space)
+      currentlyUploadingAnnotationsFile: false, // boolean, indicates if we are uploading annotatitions file
+      toggleInstantAnottations: false // boolean, idicates we if want to enable new marker creation after marker is created
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -181,6 +181,14 @@ class App extends Component {
         }
       });
 
+      this.markerArea.addEventListener('markercreate', event => {
+        if (this.state.toggleInstantAnottations){
+          event.markerArea.createNewMarker(markerjs2.FrameMarker);
+        }
+      });
+
+      // this.markerArea.removeEventListener('markercreate');
+
       // launch marker.js
       this.setState(prevState => ({...prevState, editing: true}));
       this.markerArea.show();
@@ -198,6 +206,16 @@ class App extends Component {
   finishEditing() {
     this.markerArea.startRenderAndClose();
     this.setState(prevState => ({...prevState, editing: false}));
+  }
+
+  toggleInstantAnottations = (e) => {
+    if (e.target.checked){
+      this.setState(prevState => ({ ...prevState, toggleInstantAnottations: true }));
+    }
+    else{
+      // we dont want instant annotations
+      this.setState(prevState => ({ ...prevState, toggleInstantAnottations: false }));
+    }
   }
 
   pageDisplay = () => {
@@ -236,6 +254,9 @@ class App extends Component {
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>Rectangle</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
+                        <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>Deselect</Button>
+                        <input type="checkbox" class="btn-check" id="btn-check-2-outlined" autocomplete="off" onChange={e => {this.toggleInstantAnottations(e)}}/>
+                        <label class="btn btn-outline-secondary me-2" for="btn-check-2-outlined">Checked</label>
                         <Button className="btn-danger me-5" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
                         <Button variant="outline-dark" className="ms-5" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
                           <span hidden={!this.state.currentlyUploadingAnnotationsFile} class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
