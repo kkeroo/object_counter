@@ -107,8 +107,19 @@ class App extends Component {
   handleFileRead = e => {
     const content = this.filereader.result;
     let data = JSON.parse(content);
-    console.log("asd");
-    console.log(data);
+    let newAnnotatedImages = new Array();
+
+    // add uploaded state to every image match in our uploaded images
+    for (let imgs = 0; imgs < this.state.images.length; imgs++){
+      for (let states = 0; states < data.length; states++){
+        if (data[states].filename === this.state.images[imgs].name) {
+          // we have match
+          newAnnotatedImages.push({image: {image: URL.createObjectURL(this.state.images[imgs]), file: this.state.images[imgs]}, state: data[states].state});
+        }
+      }
+    }
+
+    this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
   }
   
   handleUploadAnnotationsFile = (e) => {
