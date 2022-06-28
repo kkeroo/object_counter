@@ -228,11 +228,13 @@ class App extends Component {
                   <Container className="mt-3">
                     <Row>
                       <Col>
-                        <Button className="me-2 btn-success" onClick = {() => this.showMarkerArea()} disabled={this.state.editing}>Start</Button>
-                        <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>Rectangle</Button>
-                        <Button className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
-                        <Button className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
-                        <Button className="btn-danger" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
+                        <Button variant="success" className="me-2" onClick = {() => this.showMarkerArea()} disabled={this.state.editing}>Start</Button>
+                        <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>Rectangle</Button>
+                        <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
+                        <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
+                        <Button className="btn-danger me-5" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
+                        <Button variant="outline-dark" className="ms-5" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>Upload annotations file</Button>
+                        <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
                       </Col>
                     </Row>
                   </Container>
@@ -248,8 +250,6 @@ class App extends Component {
                     </Col>
                     <Col lg="2" className="mt-5">
                       <div className="me-5">
-                        <Button disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>Upload annotations file</Button>
-                        <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
                         <ImageList
                           images={this.state.images}
                           onPreviewSelectedImage={this.handleAnnotateSelectedImage}
@@ -276,6 +276,7 @@ class App extends Component {
           onAnnotate={this.handleAnnotatePage}
           onSaveDataset={this.handleSaveDatasetPage}
           disableSaveDataset={this.state.annotatedImages.length == 0}
+          disableAnnotate={this.state.images.length == 0}
         >
         </Navigation>
         {this.pageDisplay()}
