@@ -25,9 +25,9 @@ const LoadDataset = (props) => {
                             </Col>
                             <Col>
                                 {/* <Button size="md" className="btn-success mt-1" onClick={() => {props.onUploadAnnotationsFile();}}>Upload annotations file</Button> */}
-                                <Form.Control className="mt-1" type="file" accept=".txt" onChange={(e) => {props.onUploadAnnotationsFile(e);}}/>
-                                {/* <p className="" variant="light">Create an image dataset. Choose files to add them to the dataset. You can choose
-                                multiple files, multiple times.</p> */}
+                                {/* <Form.Control className="mt-1" type="file" accept=".txt" onChange={(e) => {props.onUploadAnnotationsFile(e);}}/> */}
+                                <p className="" variant="light">Create an image dataset. Choose files to add them to the dataset. You can choose
+                                multiple files, multiple times.</p>
                             </Col>
                         </Row>
                     </Col>

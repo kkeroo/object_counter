@@ -230,8 +230,7 @@ class App extends Component {
                       <div className="img-container">
                         <img ref={this.imgRef}
                           className="slika"
-                          src={this.state.currImage.image}
-                          alt="sample"
+                          src={this.state.currImage.image != "" ? this.state.currImage.image : ""}
                           onWheel={(e) => {this.zoom(e)}}
                         />
                       </div>
