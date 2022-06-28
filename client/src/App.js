@@ -28,7 +28,8 @@ class App extends Component {
       editing: false, // are we annotating?
       annotatedImages: new Array(), // all data (image + annotations)
       filename: "",
-      filenameErrorMessage: ""
+      filenameErrorMessage: "",
+      currentlyUploadingAnnotationsFile: false
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -118,12 +119,15 @@ class App extends Component {
         }
       }
     }
-
-    this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
+    this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }), () => {
+      // when annotations file is successfully proccessed and states are updated..
+      this.setState(prevState => ({ ...prevState, currentlyUploadingAnnotationsFile: false }));
+    });
   }
   
   handleUploadAnnotationsFile = (e) => {
     if (e.target.files[0] == undefined) return;
+    this.setState(prevState => ({ ...prevState, currentlyUploadingAnnotationsFile: true }));
     this.filereader = new FileReader();
     this.filereader.onloadend = this.handleFileRead;
     this.filereader.readAsText(e.target.files[0]);
@@ -228,12 +232,15 @@ class App extends Component {
                   <Container className="mt-3">
                     <Row>
                       <Col>
-                        <Button variant="success" className="me-2" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.file == null}>Start</Button>
+                        <Button variant="success" className="me-2" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.file == null || this.state.currentlyUploadingAnnotationsFile}>Start</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>Rectangle</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
                         <Button className="btn-danger me-5" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
-                        <Button variant="outline-dark" className="ms-5" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>Upload annotations file</Button>
+                        <Button variant="outline-dark" className="ms-5" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
+                          <span hidden={!this.state.currentlyUploadingAnnotationsFile} class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                          Upload annotations file
+                        </Button>
                         <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
                       </Col>
                     </Row>
