@@ -228,7 +228,7 @@ class App extends Component {
                   <Container className="mt-3">
                     <Row>
                       <Col>
-                        <Button variant="success" className="me-2" onClick = {() => this.showMarkerArea()} disabled={this.state.editing}>Start</Button>
+                        <Button variant="success" className="me-2" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.file == null}>Start</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>Rectangle</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
@@ -249,6 +249,7 @@ class App extends Component {
                       </div>
                     </Col>
                     <Col lg="2" className="mt-5">
+                      <h5 className="text-left me-5">Uploaded images</h5>
                       <div className="me-5">
                         <ImageList
                           images={this.state.images}
