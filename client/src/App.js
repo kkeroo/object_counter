@@ -9,6 +9,7 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
 
 import ImageList from './components/ImageList';
 import LoadDataset from './components/LoadDataset';
@@ -106,6 +107,7 @@ class App extends Component {
   handleFileRead = e => {
     const content = this.filereader.result;
     let data = JSON.parse(content);
+    console.log("asd");
     console.log(data);
   }
   
@@ -236,11 +238,13 @@ class App extends Component {
                     </Col>
                     <Col lg="2" className="mt-5">
                       <div className="me-5">
-                      <ImageList
-                        images={this.state.images}
-                        onPreviewSelectedImage={this.handleAnnotateSelectedImage}
-                      >
-                      </ImageList>
+                        <Button disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>Upload annotations file</Button>
+                        <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
+                        <ImageList
+                          images={this.state.images}
+                          onPreviewSelectedImage={this.handleAnnotateSelectedImage}
+                        >
+                        </ImageList>
                       </div>
                     </Col>
                   </Row>
