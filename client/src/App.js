@@ -3,6 +3,7 @@ import './App.css';
 import * as markerjs2 from 'markerjs2';
 import React, { Component, useState } from 'react';
 import { saveAs } from 'file-saver';
+import axios from 'axios';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
@@ -131,6 +132,35 @@ class App extends Component {
     this.filereader = new FileReader();
     this.filereader.onloadend = this.handleFileRead;
     this.filereader.readAsText(e.target.files[0]);
+  }
+
+  handleTrainModel = () => {
+    let data = this.state.annotatedImages;
+    let images = new Array();
+    let anno = new Array();
+
+    for (let i = 0; i < data.length; i++){
+      images.push(data[i].image.file);
+      anno.push(data[i].state);
+    }
+
+    console.log(images);
+    console.log(anno);
+
+    let formData = new FormData();
+    formData.append('images', images);
+    formData.append('annotations', anno);
+
+    axios({
+      method:'POST',
+      url: "http://localhost:8000",
+      data: formData,
+      headers:{ "Content-Type": "multipart/form-data" }
+    }).then(response => {
+      console.log(response);
+    }).catch(error => {
+      console.error(error);
+    });
   }
 
   updateAnnotatedImages = (currentState) => {
@@ -304,8 +334,10 @@ class App extends Component {
           onLoadDataset={this.handleLoadDatasetPage}
           onAnnotate={this.handleAnnotatePage}
           onSaveDataset={this.handleSaveDatasetPage}
+          onTrainModel={this.handleTrainModel}
           disableSaveDataset={this.state.annotatedImages.length == 0}
           disableAnnotate={this.state.images.length == 0}
+          disableTrainModel={this.state.annotatedImages.length == 0}
         >
         </Navigation>
         {this.pageDisplay()}
