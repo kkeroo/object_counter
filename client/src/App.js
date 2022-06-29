@@ -255,7 +255,7 @@ class App extends Component {
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
                         <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>Deselect</Button>
-                        <input type="checkbox" class="btn-check" id="btn-check-2-outlined" autocomplete="off" onChange={e => {this.toggleInstantAnottations(e)}}/>
+                        <input type="checkbox" class="btn-check" id="btn-check-2-outlined" autocomplete="off" onChange={e => {this.toggleInstantAnottations(e)}} disabled={!this.state.editing} />
                         <label class="btn btn-outline-secondary me-2" for="btn-check-2-outlined">Checked</label>
                         <Button className="btn-danger me-5" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
                         <Button variant="outline-dark" className="ms-5" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
