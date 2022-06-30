@@ -136,31 +136,62 @@ class App extends Component {
 
   handleTrainModel = () => {
     let data = this.state.annotatedImages;
+    let objs = new Array();
+
     let images = new Array();
     let anno = new Array();
 
     for (let i = 0; i < data.length; i++){
       images.push(data[i].image.file);
-      anno.push(data[i].state);
+      // anno.push(data[i].state);
+      // let obj = {image: data[i].image.file};
+      // let obj = {}
+      let ann = {width: data[i].state.width, height: data[i].state.height};
+      let ms = new Array();
+      for (let j = 0; j < data[i].state.markers.length; j++){
+        let m = {left: data[i].state.markers[j].left, top: data[i].state.markers[j].top, width: data[i].state.markers[j].width, height: data[i].state.markers[j].height};
+        ms.push(m);
+      }
+      ann.markers = ms;
+      anno.push(ann);
+      // obj.annotation = ann;
+
+      // objs.push(obj);
     }
 
-    console.log(images);
     console.log(anno);
 
     let formData = new FormData();
-    formData.append('images', images);
-    formData.append('annotations', anno);
+    // formData.append('data', objs);
+    images.forEach(img => {
+      formData.append('images', img);
+      
+    });
+
+    // anno.forEach(ann => {
+    //   f.append('annotations', ann);      
+    // });
+    
 
     axios({
       method:'POST',
       url: "http://localhost:8000",
-      data: formData,
-      headers:{ "Content-Type": "multipart/form-data" }
+      data: formData
     }).then(response => {
       console.log(response);
+      axios({
+        method:'POST',
+        url: "http://localhost:8000/anno",
+        data: anno
+      }).then(response => {
+        console.log(response);
+      }).catch(error => {
+        console.error(error);
+      });
     }).catch(error => {
       console.error(error);
     });
+
   }
 
   updateAnnotatedImages = (currentState) => {
