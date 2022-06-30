@@ -10,9 +10,22 @@
     border: 2px solid gray;
 }
 
-.image-list-container {
-    height: 94vh;
-    background-color: #AAA;
+@media screen and (max-height: 1080px) {
+    .image-list-container {
+        height: 94vh;
+        background-color: #AAA;
+    }
+}
+
+@media screen and (max-height: 700px) {
+    .image-list-container {
+        height: 90vh;
+        background-color: #AAA;
+    }
+
+    .image-list {
+        max-height: 200px;
+    }
 }
 
 .image-preview-container {
