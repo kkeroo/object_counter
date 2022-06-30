@@ -30,7 +30,8 @@ class App extends Component {
       filename: "", // file name of a annotations file, we want to download
       filenameErrorMessage: "", // error message (eg. unvalid filename, contains . or space)
       currentlyUploadingAnnotationsFile: false, // boolean, indicates if we are uploading annotatitions file
-      toggleInstantAnottations: false // boolean, idicates we if want to enable new marker creation after marker is created
+      toggleInstantAnottations: false, // boolean, idicates we if want to enable new marker creation after marker is created
+      alreadyTraining: false
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -135,17 +136,14 @@ class App extends Component {
   }
 
   handleTrainModel = () => {
-    let data = this.state.annotatedImages;
-    let objs = new Array();
+    if (this.state.alreadyTraining) return;
 
+    let data = this.state.annotatedImages;
     let images = new Array();
     let anno = new Array();
 
     for (let i = 0; i < data.length; i++){
       images.push(data[i].image.file);
-      // anno.push(data[i].state);
-      // let obj = {image: data[i].image.file};
-      // let obj = {}
       let ann = {width: data[i].state.width, height: data[i].state.height};
       let ms = new Array();
       for (let j = 0; j < data[i].state.markers.length; j++){
@@ -154,37 +152,28 @@ class App extends Component {
       }
       ann.markers = ms;
       anno.push(ann);
-      // obj.annotation = ann;
-
-      // objs.push(obj);
     }
 
-    console.log(anno);
-
     let formData = new FormData();
-    // formData.append('data', objs);
     images.forEach(img => {
       formData.append('images', img);
       
     });
-
-    // anno.forEach(ann => {
-    //   f.append('annotations', ann);      
-    // });
-    
 
     axios({
       method:'POST',
       url: "http://localhost:8000",
       data: formData
     }).then(response => {
-      console.log(response);
+      let user_hash = response.data.hash;
+      let data = {annotations: anno, user_hash: user_hash};
+      console.log(data);
       axios({
         method:'POST',
         url: "http://localhost:8000/anno",
-        data: anno
+        data: data
       }).then(response => {
-        console.log(response);
+        this.setState(prevState => ({...prevState, alreadyTraining: true}));
       }).catch(error => {
         console.error(error);
       });
