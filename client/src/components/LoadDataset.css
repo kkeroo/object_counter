@@ -3,12 +3,25 @@
 }
 
 .images-list {
+    margin-right: 3rem;
+    margin-left: 3rem;
     max-height: 500px;
     overflow-y: auto;
     border: 2px solid gray;
 }
 
+.image-list-container {
+    height: 94vh;
+    background-color: #AAA;
+}
+
 .image-preview-container {
+    text-align: right;
+}
+
+.preview-image {
     /* background-color: #DDD; */
-    min-height: 70vh;
+    /* min-height: 70vh; */
+    max-height: 80vh;
+    width: auto;
 }

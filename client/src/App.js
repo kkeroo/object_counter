@@ -31,7 +31,7 @@ class App extends Component {
       filenameErrorMessage: "", // error message (eg. unvalid filename, contains . or space)
       currentlyUploadingAnnotationsFile: false, // boolean, indicates if we are uploading annotatitions file
       toggleInstantAnottations: false, // boolean, idicates we if want to enable new marker creation after marker is created
-      alreadyTraining: false
+      alreadyTraining: false // boolean, idicates if we already sent data to backend...
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
