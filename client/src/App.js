@@ -10,6 +10,7 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Stack from 'react-bootstrap/Stack';
 
 import ImageList from './components/ImageList';
 import LoadDataset from './components/LoadDataset';
@@ -295,51 +296,133 @@ class App extends Component {
         }
       case "annotate":
         {
+          // return (
+          //       <div className="App">
+          //         <Container className="mt-3">
+          //           <Row>
+          //             <Col>
+          //               <Button variant="success" className="me-2" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.file == null || this.state.currentlyUploadingAnnotationsFile}>Start</Button>
+          //               <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>Rectangle</Button>
+          //               <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
+          //               <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
+          //               <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>Deselect</Button>
+          //               <input type="checkbox" class="btn-check" id="btn-check-2-outlined" autocomplete="off" onChange={e => {this.toggleInstantAnottations(e)}} disabled={!this.state.editing} />
+          //               <label class="btn btn-outline-secondary me-2" for="btn-check-2-outlined">Checked</label>
+          //               <Button className="btn-danger me-5" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
+          //               <Button variant="outline-dark" className="ms-5" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
+          //                 <span hidden={!this.state.currentlyUploadingAnnotationsFile} class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          //                 Upload annotations file
+          //               </Button>
+          //               <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
+          //             </Col>
+          //           </Row>
+          //         </Container>
+          //         <Row>
+          //           <Col lg="10">
+          //             <div className="img-container">
+          //               <img ref={this.imgRef}
+          //                 className="slika"
+          //                 src={this.state.currImage.image != "" ? this.state.currImage.image : ""}
+          //                 onWheel={(e) => {this.zoom(e)}}
+          //               />
+          //             </div>
+          //           </Col>
+          //           <Col lg="2" className="mt-5">
+          //             <h5 className="text-left me-5">Uploaded images</h5>
+          //             <div className="me-5">
+          //               <ImageList
+          //                 images={this.state.images}
+          //                 onPreviewSelectedImage={this.handleAnnotateSelectedImage}
+          //               >
+          //               </ImageList>
+          //             </div>
+          //           </Col>
+          //         </Row>
+          //       </div>
+          //     );
           return (
-                <div className="App">
-                  <Container className="mt-3">
-                    <Row>
-                      <Col>
-                        <Button variant="success" className="me-2" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.file == null || this.state.currentlyUploadingAnnotationsFile}>Start</Button>
-                        <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>Rectangle</Button>
-                        <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
-                        <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
-                        <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>Deselect</Button>
-                        <input type="checkbox" class="btn-check" id="btn-check-2-outlined" autocomplete="off" onChange={e => {this.toggleInstantAnottations(e)}} disabled={!this.state.editing} />
-                        <label class="btn btn-outline-secondary me-2" for="btn-check-2-outlined">Checked</label>
-                        <Button className="btn-danger me-5" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
-                        <Button variant="outline-dark" className="ms-5" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
-                          <span hidden={!this.state.currentlyUploadingAnnotationsFile} class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                          Upload annotations file
+            <div className="App">
+              <Container fluid className="">
+                <Row>
+                  <Col lg="9">
+                    <div className="img-container mt-4 me-5">
+                      <img ref={this.imgRef}
+                        className="slika"
+                        src={this.state.currImage.image != "" ? this.state.currImage.image : ""}
+                        hidden={this.state.currImage.image == ""}
+                      />
+                    </div>
+                  </Col>
+                  <Col lg="3" className="toolbox">
+                    
+                    <Stack direction="horizontal" className="ms-auto me-auto mt-3">
+                      <Button variant="outline-dark" className="me-auto ms-auto upload-btn" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
+                        <span hidden={!this.state.currentlyUploadingAnnotationsFile} class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        Upload annotations file
+                      </Button>
+                      <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
+                    </Stack>
+
+                    <Stack direction='horizontal' gap="3" className="ms-5 me-5 mt-3 text-center">
+                      <div>
+                        <Button variant="success" className="" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.file == null || this.state.currentlyUploadingAnnotationsFile}>
+                          Start
                         </Button>
-                        <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
-                      </Col>
-                    </Row>
-                  </Container>
-                  <Row>
-                    <Col lg="10">
-                      <div className="img-container">
-                        <img ref={this.imgRef}
-                          className="slika"
-                          src={this.state.currImage.image != "" ? this.state.currImage.image : ""}
-                          onWheel={(e) => {this.zoom(e)}}
-                        />
                       </div>
-                    </Col>
-                    <Col lg="2" className="mt-5">
-                      <h5 className="text-left me-5">Uploaded images</h5>
-                      <div className="me-5">
-                        <ImageList
-                          images={this.state.images}
-                          onPreviewSelectedImage={this.handleAnnotateSelectedImage}
-                        >
-                        </ImageList>
+                      <div>
+                        <Button className="btn-danger" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
                       </div>
-                    </Col>
-                  </Row>
-                </div>
-              );
-          break;
+                    </Stack>
+
+                    <Stack direction="horizontal" gap="3" className="ms-2 me-2 mt-3">
+                      <Button variant="primary" className="me-auto ms-auto" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>
+                        <i class="bi bi-plus-square"></i>
+                      </Button>
+                      <Button variant="secondary" className="me-auto ms-auto" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>
+                        <i class="bi bi-cursor"></i>
+                        </Button>
+                      <input type="checkbox" class="btn-check ms-auto me-auto" id="btn-check-2-outlined" autocomplete="off" onChange={e => {this.toggleInstantAnottations(e)}} disabled={!this.state.editing} />
+                      <label class="btn btn-outline-secondary ms-auto me-auto" for="btn-check-2-outlined">
+                        <i class="bi bi-lightning"></i>
+                      </label>
+                      <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>
+                        <i class="bi bi-zoom-in"></i>
+                      </Button>
+                      <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>
+                        <i class="bi bi-zoom-out"></i>
+                      </Button>
+                    </Stack>
+
+                    <h5 className="text-light mt-4 ms-5 me-5">Uploaded images</h5>
+                    <ImageList
+                      images={this.state.images}
+                      onPreviewSelectedImage={this.handleAnnotateSelectedImage}
+                    >
+                    </ImageList>
+                    <h6 className="ms-5 mt-4 text-light info-text">Total images: {this.state.images.length}</h6>
+                    <h6 className="ms-5 mt-2 text-light info-text">Total images: {10}</h6>
+                  </Col>
+                </Row>
+                {/* <Row>
+                  <Col>
+                    <Button variant="success" className="me-2" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.file == null || this.state.currentlyUploadingAnnotationsFile}>Start</Button>
+                    <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>Rectangle</Button>
+                    <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.createNewMarker(markerjs2.EllipseMarker); }} disabled={!this.state.editing}>Ellipse</Button>
+                    <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>Zoom in</Button>
+                    <Button variant="outline-primary" className="me-2" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>Deselect</Button>
+                    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" autocomplete="off" onChange={e => {this.toggleInstantAnottations(e)}} disabled={!this.state.editing} />
+                    <label class="btn btn-outline-secondary me-2" for="btn-check-2-outlined">Checked</label>
+                    <Button className="btn-danger me-5" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
+                    <Button variant="outline-dark" className="ms-5" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
+                      <span hidden={!this.state.currentlyUploadingAnnotationsFile} class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                      Upload annotations file
+                    </Button>
+                    <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
+                  </Col>
+                </Row> */}
+              </Container>
+            </div>
+          );
         }
     
       default:
