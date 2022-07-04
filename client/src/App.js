@@ -185,6 +185,7 @@ class App extends Component {
   }
 
   updateAnnotatedImages = (currentState) => {
+    if (currentState.markers.length == 0) return;
     const newAnnotatedImages = this.state.annotatedImages;
     const currImage = this.state.currImage;
 
@@ -252,6 +253,14 @@ class App extends Component {
     if (deltaY > 1){
       this.markerArea.stepZoom();
     }
+  }
+
+  zoomIn() {
+    this.markerArea.stepZoom();
+  }
+
+  zoomOut() {
+    this.markerArea.zoomLevel = 1;
   }
 
   finishEditing() {
@@ -385,10 +394,10 @@ class App extends Component {
                       <label class="btn btn-outline-secondary ms-auto me-auto" for="btn-check-2-outlined">
                         <i class="bi bi-lightning"></i>
                       </label>
-                      <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>
+                      <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomIn(); }} disabled={!this.state.editing}>
                         <i class="bi bi-zoom-in"></i>
                       </Button>
-                      <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.markerArea.stepZoom(); }} disabled={!this.state.editing}>
+                      <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomOut(); }} disabled={!this.state.editing}>
                         <i class="bi bi-zoom-out"></i>
                       </Button>
                     </Stack>
