@@ -154,8 +154,9 @@ class App extends Component {
       if (response.data.job_status === "finished"){
         clearInterval(this.interval);
         this.interval = null;
-        console.log(this.interval);
-        console.log("JOB FINISHED");
+        // console.log(this.interval);
+        // console.log("JOB FINISHED");
+        this.setState(prevState => ({ ...prevState, trainingFinished: true }));
       }
     });
   }
@@ -417,6 +418,7 @@ class App extends Component {
         onTrainTestSplit={this.handleTrainTestSplit}
         onTrain={this.handleTrainModel}
         alreadyTraining={this.state.alreadyTraining}
+        trainingFinished={this.state.trainingFinished}
         ></Train>
       }
       default:

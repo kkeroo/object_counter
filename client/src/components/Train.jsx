@@ -11,7 +11,7 @@ import Col from "react-bootstrap/esm/Col";
 const Train = (props) => {
     return (
         <Container className="Train">
-            <Row className="mt-5">
+            <Row className="mt-5" hidden={props.trainingFinished}>
                 <Col></Col>
                 <Col>
                     <Form.Label>Model name</Form.Label>
@@ -26,7 +26,7 @@ const Train = (props) => {
                 </Col>
                 <Col></Col>
             </Row>
-            <Row className="mt-5">
+            <Row className="mt-5" hidden={!props.trainingFinished}>
                 <Col></Col>
                 <Col>
                     <h4>Training Finished</h4>
