@@ -174,6 +174,7 @@ class App extends Component {
         url: "http://localhost:8000/anno",
         data: data
       }).then(response => {
+        console.log(response);
         this.setState(prevState => ({...prevState, alreadyTraining: true}));
       }).catch(error => {
         console.error(error);
