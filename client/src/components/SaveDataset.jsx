@@ -15,7 +15,7 @@ const SaveDataset = (props) => {
             <p>In order to save current annotations on your dataset, set the name of a 
                 file where the information about the annotations will be stored.
                 You will need that file when you will want to continue annotate images next time.</p>
-            <Form>
+            <Form onSubmit={props.onSaveDataset}>
                 <Form.Group>
                     <Form.Label>File name</Form.Label>
                     <Form.Control required type="text" onChange={e => { props.onFileNameEnter(e.target.value) }} placeholder="Enter file name"/>
