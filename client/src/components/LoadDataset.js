@@ -63,18 +63,18 @@ const LoadDataset = (props) => {
                         </div>
                     </Col>
                     <Col lg="3" className="image-list-container">
-                        <h5 className="text-light mt-4 ms-5">Uploaded images</h5>
-                        <Stack direction='horizontal' gap="3" className="mt-3 mb-3 ms-5 me-5">
+                        <Stack direction='horizontal' gap="3" className="mt-4 mb-3 ms-5 me-5">
                             <input id="image-file-input" hidden type="file" multiple accept=".jpg" onChange={(e) => {props.onImageSelected(e);}}/>
                             <Button size="sm" className="btn-success mb-2 me-auto" onClick={() => {document.getElementById('image-file-input').click()}}>Upload Dataset</Button>
                             <Button size="sm" className="btn-danger mb-2 ms-auto" onClick={() => {props.onDeleteDataset();}}>Delete dataset</Button>
                         </Stack>
+                        <h5 className="text-light mt-2 ms-5">Uploaded images</h5>
+                        <h6 className="ms-5 mt-2 mb-2 text-light">Total images: {props.images.length}</h6>
                         <ImageList
                             images={props.images}
                             onPreviewSelectedImage={props.onPreviewSelectedImage}
                         >
                         </ImageList>
-                        <h6 className="ms-5 mt-4 text-light">Total images: {props.images.length}</h6>
                     </Col>
                 </Row>
                 

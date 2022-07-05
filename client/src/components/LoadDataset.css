@@ -5,14 +5,14 @@
 .images-list {
     margin-right: 3rem;
     margin-left: 3rem;
-    max-height: 500px;
+    max-height: 480px;
     overflow-y: auto;
     border: 2px solid gray;
 }
 
 @media screen and (max-height: 1080px) {
     .image-list-container {
-        height: 94vh;
+        height: 93vh;
         background-color: #AAA;
     }
 }
