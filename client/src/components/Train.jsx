@@ -17,7 +17,7 @@ const Train = (props) => {
                     <Form.Label>Model name</Form.Label>
                     <Form.Control disabled type="text" placeholder="Enter model name"/>
                     <p className="text-danger mt-1">Please enter valid model name</p>
-                    <Form.Check disabled type="checkbox" className="mt-3" label="Train-Test split"/>
+                    <Form.Check disabled type="checkbox" className="mt-3" label="Train-Test split (70-30 split)"/>
                     <Button variant="success" className="mt-3" disabled>
                         <div className="spinner-border spinner-border-sm me-2" role="status"></div>
                         Training...
@@ -36,6 +36,15 @@ const Train = (props) => {
                     <Button variant="success" className="mt-2">
                         Download model
                     </Button>
+                </Col>
+                <Col></Col>
+            </Row>
+            <Row className="mt-5">
+                <Col></Col>
+                <Col>
+                <div class="alert alert-danger" role="alert">
+                    A simple danger alert—check it out!
+                </div>
                 </Col>
                 <Col></Col>
             </Row>
