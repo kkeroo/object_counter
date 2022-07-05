@@ -45,14 +45,14 @@
 .images-list {
   margin-right: 3rem;
   margin-left: 3rem;
-  max-height: 400px;
+  max-height: 400px !important;
   overflow-y: auto;
   border: 2px solid gray;
 }
 
 @media screen and (max-height: 1080px) {
   .toolbox {
-      height: 94vh;
+      height: 93vh;
       background-color: #AAA;
   }
 }

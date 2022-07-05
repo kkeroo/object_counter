@@ -354,14 +354,14 @@ class App extends Component {
                       </Button>
                     </Stack>
 
-                    <h5 className="text-light mt-4 ms-5 me-5">Uploaded images</h5>
+                    <h5 className="text-light mt-4 ms-5 me-5 info-text">Uploaded images</h5>
+                    <h6 className="ms-5 mt-2 text-light info-text">Total images: {this.state.images.length}</h6>
+                    {/* <h6 className="ms-5 mt-2 mb-2 text-light info-text">Total annotations: {10}</h6> */} {/* TODO */}
                     <ImageList
                       images={this.state.images}
                       onPreviewSelectedImage={this.handleAnnotateSelectedImage}
                     >
                     </ImageList>
-                    <h6 className="ms-5 mt-4 text-light info-text">Total images: {this.state.images.length}</h6>
-                    <h6 className="ms-5 mt-2 text-light info-text">Total images: {10}</h6>
                   </Col>
                 </Row>
               </Container>
