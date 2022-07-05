@@ -16,6 +16,7 @@ import ImageList from './components/ImageList';
 import LoadDataset from './components/LoadDataset';
 import Navigation from './components/Navbar';
 import SaveDataset from './components/SaveDataset';
+import Train from './components/Train';
 
 class App extends Component {
   constructor(props){
@@ -138,6 +139,8 @@ class App extends Component {
 
   handleTrainModel = () => {
     if (this.state.alreadyTraining) return;
+
+    this.setState(prevState => ({ ...prevState, page:'train' }));
 
     let data = this.state.annotatedImages;
     let images = new Array();
@@ -369,7 +372,10 @@ class App extends Component {
             </div>
           );
         }
-    
+      case 'train':
+      {
+        return <Train></Train>
+      }
       default:
         break;
     }
