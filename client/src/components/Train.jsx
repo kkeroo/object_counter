@@ -15,14 +15,14 @@ const Train = (props) => {
                 <Col></Col>
                 <Col>
                     <Form.Label>Model name</Form.Label>
-                    <Form.Control disabled type="text" placeholder="Enter model name"/>
+                    <Form.Control disabled={props.alreadyTraining} onChange={e => { props.onEnterModelName(e)}} type="text" placeholder="Enter model name"/>
                     <p className="text-danger mt-1">Please enter valid model name</p>
-                    <Form.Check disabled type="checkbox" className="mt-3" label="Train-Test split (70-30 split)"/>
-                    <Button variant="success" className="mt-3" disabled>
-                        <div className="spinner-border spinner-border-sm me-2" role="status"></div>
-                        Training...
+                    <Form.Check disabled={props.alreadyTraining} type="checkbox" className="mt-3" onClick={() => {props.onTrainTestSplit()}} label="Train-Test split (70-30 split)"/>
+                    <Button variant="success" className="mt-3" onClick={() => {props.onTrain()}} disabled={props.alreadyTraining}>
+                        <div hidden={!props.alreadyTraining} className="spinner-border spinner-border-sm me-2" role="status"></div>
+                        {props.alreadyTraining ? "Training..." : "Train"}
                     </Button>
-                    <Button variant="danger mt-3 ms-3">Cancel training</Button>
+                    <Button hidden={!props.alreadyTraining} variant="danger mt-3 ms-3">Cancel training</Button>
                 </Col>
                 <Col></Col>
             </Row>

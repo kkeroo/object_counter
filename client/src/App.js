@@ -33,11 +33,15 @@ class App extends Component {
       filenameErrorMessage: "", // error message (eg. unvalid filename, contains . or space)
       currentlyUploadingAnnotationsFile: false, // boolean, indicates if we are uploading annotatitions file
       toggleInstantAnottations: false, // boolean, idicates we if want to enable new marker creation after marker is created
-      alreadyTraining: false // boolean, idicates if we already sent data to backend...
+      alreadyTraining: false, // boolean, idicates if we already sent data to backend...
+      modelName: "", // name of a model we will download when training is finished
+      trainTestSplit: false, // use a train and test split during training
+      trainingFinished: false // indicates if the current training proccess is finished
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
     this.filereader = null;
+    this.interval = null;
   }
 
   fileNameValidation = (filename) => {
@@ -137,10 +141,35 @@ class App extends Component {
     this.filereader.readAsText(e.target.files[0]);
   }
 
+  handleTrainPage = () => {
+    this.setState(prevState => ({ ...prevState, page:'train' }));
+  }
+
+  intervalFunc = () => {
+    axios({
+      method:'GET',
+      url: 'http://localhost:8000/job/'+this.state.job_id
+    }).then(response => {
+      console.log(response);
+      if (response.data.job_status === "finished"){
+        clearInterval(this.interval);
+        this.interval = null;
+        console.log(this.interval);
+        console.log("JOB FINISHED");
+      }
+    });
+  }
+
+  checkTraining = (job_id) => {
+    this.setState(prevState => ({ ...prevState, job_id: job_id }), () => {
+      this.interval = setInterval(this.intervalFunc, 2000);
+    });
+  }
+
   handleTrainModel = () => {
     if (this.state.alreadyTraining) return;
 
-    this.setState(prevState => ({ ...prevState, page:'train' }));
+    this.setState(prevState => ({ ...prevState, alreadyTraining: true }));
 
     let data = this.state.annotatedImages;
     let images = new Array();
@@ -178,7 +207,8 @@ class App extends Component {
         data: data
       }).then(response => {
         console.log(response);
-        this.setState(prevState => ({...prevState, alreadyTraining: true}));
+        // check if training is finished
+        this.checkTraining(response.data.job_id);
       }).catch(error => {
         console.error(error);
       });
@@ -186,6 +216,14 @@ class App extends Component {
       console.error(error);
     });
 
+  }
+
+  handleEnterModelName = (e) => {
+    this.setState(prevState => ({ ...prevState, modelName: e.target.value }));
+  }
+
+  handleTrainTestSplit = () => {
+    this.setState(prevState => ({ ...prevState, trainTestSplit: !this.state.trainTestSplit }));
   }
 
   updateAnnotatedImages = (currentState) => {
@@ -374,7 +412,12 @@ class App extends Component {
         }
       case 'train':
       {
-        return <Train></Train>
+        return <Train
+        onEnterModelName={this.handleEnterModelName}
+        onTrainTestSplit={this.handleTrainTestSplit}
+        onTrain={this.handleTrainModel}
+        alreadyTraining={this.state.alreadyTraining}
+        ></Train>
       }
       default:
         break;
@@ -388,7 +431,7 @@ class App extends Component {
           onLoadDataset={this.handleLoadDatasetPage}
           onAnnotate={this.handleAnnotatePage}
           onSaveDataset={this.handleSaveDatasetPage}
-          onTrainModel={this.handleTrainModel}
+          onTrainModel={this.handleTrainPage}
           disableSaveDataset={this.state.annotatedImages.length == 0}
           disableAnnotate={this.state.images.length == 0}
           disableTrainModel={this.state.annotatedImages.length == 0}
