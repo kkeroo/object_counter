@@ -227,6 +227,20 @@ class App extends Component {
     this.setState(prevState => ({ ...prevState, trainTestSplit: !this.state.trainTestSplit }));
   }
 
+  handleCancelTraining = () => {
+    axios({
+      method:'DELETE',
+      url: 'http://localhost:8000/job/'+this.state.job_id
+    }).then(response => {
+      console.log(response);
+      clearInterval(this.interval);
+      this.interval = null;
+      this.setState(prevState => ({ ...prevState, alreadyTraining: false, modelName: "", trainTestSplit: false, trainingFinished: false }));
+    }).catch(err => {
+      console.error(err);
+    })
+  }
+
   updateAnnotatedImages = (currentState) => {
     if (currentState.markers.length == 0) return;
     const newAnnotatedImages = this.state.annotatedImages;
@@ -417,6 +431,7 @@ class App extends Component {
         onEnterModelName={this.handleEnterModelName}
         onTrainTestSplit={this.handleTrainTestSplit}
         onTrain={this.handleTrainModel}
+        onCancelTraining={this.handleCancelTraining}
         alreadyTraining={this.state.alreadyTraining}
         trainingFinished={this.state.trainingFinished}
         ></Train>

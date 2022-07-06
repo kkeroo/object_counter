@@ -22,7 +22,7 @@ const Train = (props) => {
                         <div hidden={!props.alreadyTraining} className="spinner-border spinner-border-sm me-2" role="status"></div>
                         {props.alreadyTraining ? "Training..." : "Train"}
                     </Button>
-                    <Button hidden={!props.alreadyTraining} variant="danger mt-3 ms-3">Cancel training</Button>
+                    <Button hidden={!props.alreadyTraining} onClick={() => {props.onCancelTraining()}} variant="danger mt-3 ms-3">Cancel training</Button>
                 </Col>
                 <Col></Col>
             </Row>
