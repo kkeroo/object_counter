@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import Button from 'react-bootstrap/Button';
 
 function Navigation(props){
     return (
@@ -20,6 +21,7 @@ function Navigation(props){
                         <Nav.Link href="#3" onClick={() => {props.onLoadModel()}}>Load model</Nav.Link>
                         <Nav.Link href="#4" onClick={() => {props.onTrainModel()}} disabled={props.disableTrainModel}>Train</Nav.Link>
                         <Nav.Link href="#5" onClick={() => {props.onPredict()}}>Predict</Nav.Link>
+                        <Nav.Link className="text-warning" size="sm" onClick={() => {props.onReset()}}>Reset</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

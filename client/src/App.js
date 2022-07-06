@@ -45,6 +45,11 @@ class App extends Component {
     this.interval = null;
   }
 
+  handleReset = () => {
+    this.handleCancelTraining();
+    window.location.reload();
+  }
+
   fileNameValidation = (filename) => {
     if (filename == '') return false;
     let re = /^[\w-]+$/;
@@ -454,6 +459,7 @@ class App extends Component {
           onAnnotate={this.handleAnnotatePage}
           onSaveDataset={this.handleSaveDatasetPage}
           onTrainModel={this.handleTrainPage}
+          onReset={this.handleReset}
           disableSaveDataset={this.state.annotatedImages.length == 0}
           disableAnnotate={this.state.images.length == 0}
           disableTrainModel={this.state.annotatedImages.length == 0}
