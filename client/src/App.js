@@ -36,7 +36,8 @@ class App extends Component {
       alreadyTraining: false, // boolean, idicates if we already sent data to backend...
       modelName: "", // name of a model we will download when training is finished
       trainTestSplit: false, // use a train and test split during training
-      trainingFinished: false // indicates if the current training proccess is finished
+      trainingFinished: false, // indicates if the current training proccess is finished
+      jobCancelStatus: "" // status of a canceled job: success or error
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -232,10 +233,13 @@ class App extends Component {
       method:'DELETE',
       url: 'http://localhost:8000/job/'+this.state.job_id
     }).then(response => {
-      console.log(response);
       clearInterval(this.interval);
       this.interval = null;
-      this.setState(prevState => ({ ...prevState, alreadyTraining: false, modelName: "", trainTestSplit: false, trainingFinished: false }));
+      this.setState(prevState => ({ ...prevState, alreadyTraining: false, modelName: "", trainTestSplit: false, trainingFinished: false, jobCancelStatus: response.data.status }));
+      const timer = setTimeout(() => {
+        this.setState(prevState => ({ ...prevState, jobCancelStatus: "" }));
+        clearTimeout(timer);
+      }, 2000);
     }).catch(err => {
       console.error(err);
     })
@@ -434,6 +438,7 @@ class App extends Component {
         onCancelTraining={this.handleCancelTraining}
         alreadyTraining={this.state.alreadyTraining}
         trainingFinished={this.state.trainingFinished}
+        jobCancelStatus={this.state.jobCancelStatus}
         ></Train>
       }
       default:

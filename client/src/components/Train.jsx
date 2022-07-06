@@ -42,8 +42,11 @@ const Train = (props) => {
             <Row className="mt-5">
                 <Col></Col>
                 <Col>
-                <div class="alert alert-danger" role="alert">
-                    A simple danger alert—check it out!
+                <div class="alert alert-danger" role="alert" hidden={props.jobCancelStatus !== "error"}>
+                    {props.jobCancelStatus === "error" ? "There was an error while canceling training." : ""}
+                </div>
+                <div class="alert alert-warning" role="alert" hidden={props.jobCancelStatus !== "success"}>
+                    {props.jobCancelStatus === "success" ? "Training was successfully canceled." : ""}
                 </div>
                 </Col>
                 <Col></Col>
