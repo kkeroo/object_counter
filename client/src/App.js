@@ -37,7 +37,8 @@ class App extends Component {
       modelName: "", // name of a model we will download when training is finished
       trainTestSplit: false, // use a train and test split during training
       trainingFinished: false, // indicates if the current training proccess is finished
-      jobCancelStatus: "" // status of a canceled job: success or error
+      jobCancelStatus: "", // status of a canceled job: success or error
+      uploadingImages: false
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -57,7 +58,30 @@ class App extends Component {
     return false;
   }
 
-  handleImageSelected = (event) => { 
+  handleServerUpload = () => {
+    this.setState(prevState => ({ ...prevState, uploadingImages: true }));
+    let images = this.state.images;
+    console.log(images);
+    if (images.length == 0) return;
+
+    let data = new FormData();
+    images.forEach(img => {
+      data.append('images', img);
+    });
+
+    axios({
+      method:'POST',
+      url: "/images",
+      data: data
+    }).then(response => {
+      console.log(response);
+      this.setState(prevState => ({ ...prevState, uploadingImages: false }));
+    }).catch(e => {
+      console.error(e);
+    });
+  }
+
+  handleImageSelected = (event) => {
     for (let file of event.target.files) {
         if (this.state.images.length == 0){
           // we dont yet have an image in our dataset
@@ -353,7 +377,9 @@ class App extends Component {
             onPreviewSelectedImage={this.handlePreviewSelectedImage}
             onDeleteDataset={this.handleDeleteDataset}
             onUploadAnnotationsFile={this.handleUploadAnnotationsFile}
-            images={this.state.images} 
+            onServerUpload={this.handleServerUpload}
+            images={this.state.images}
+            uploadingImages={this.state.uploadingImages}
             previewImage={this.state.previewImage}>
           </LoadDataset> )
         }

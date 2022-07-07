@@ -75,6 +75,9 @@ const LoadDataset = (props) => {
                             onPreviewSelectedImage={props.onPreviewSelectedImage}
                         >
                         </ImageList>
+                        <Button variant="success" disabled={props.uploadingImages} className="ms-5 mt-2" onClick={() => {props.onServerUpload()}}>
+                            {props.uploadingImages ? "Uploading..." : "Upload on server"}
+                        </Button>
                     </Col>
                 </Row>
                 
