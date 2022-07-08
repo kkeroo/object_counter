@@ -105,3 +105,6 @@ dist
 
 # Python API
 python_api
+
+uploaded_annotations
+uploaded_images

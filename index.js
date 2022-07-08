@@ -6,6 +6,7 @@ const express = require("express");
 var cors = require('cors');
 const bodyParser = require('body-parser');
 const multer = require('multer');
+const fs = require('fs');
 
 const PORT = process.env.PORT || 4000;
 const app = express();
@@ -61,9 +62,62 @@ app.post('/', (req, res) => {
   res.send("hello");
 })
 
+app.get('/images/:image_name', (req, res) => {
+  let image_name = req.params.image_name;
+  res.sendFile(image_name, {root: './uploaded_images/'});
+});
+
+app.get('/images', (req, res) => {
+  image_names = fs.readdirSync('./uploaded_images');
+  image_paths = new Array();
+  image_names.forEach(file => {
+    image_paths.push({name:file, path:'http://localhost:4000/images/'+file});
+    // image_paths.push(file);
+  });
+
+  res.json({ images: image_paths });
+  // image_paths.map(i => {
+  //   return res.sendFile(i, { root: './uploaded_images/'});
+  // })
+})
+
 app.post('/images', upload.array('images'), (req, res) => {
   res.send("done");
 })
+
+app.post('/annotations', (req, res) => {
+  let state = JSON.stringify(req.body.state);
+  let image_name = req.body.image;
+  image_name = path.parse(image_name).name;
+
+  let file_name = './uploaded_annotations/' + image_name + '.txt';
+
+  fs.writeFile(file_name, state, (err => {
+    if (err) {
+      res.json({ status: 500 });
+    }
+    else{
+      res.json( {status: 201 });
+    }
+  }));
+});
+
+app.get('/annotations/:image_name', (req, res) => {
+  let image_name = path.parse(req.params.image_name).name;
+  let file_name = './uploaded_annotations/' + image_name + '.txt';
+  fs.access(file_name, fs.F_OK, err => {
+    if (err){
+      console.error(err);
+      return res.json({ status: 500 });
+    }
+    fs.readFile(file_name, 'utf-8', (err, data) => {
+      if (err) {
+        return res.json({ status: 500, state: null });
+      }
+      return res.json( {status: 200, state: JSON.parse(data) });
+    });
+  });
+});
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);

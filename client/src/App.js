@@ -23,10 +23,11 @@ class App extends Component {
     super(props);
     // page is name of the page (link in navbar), can be: load_dataset, annotate, save, load_model, train, predict
     this.state = {
+      uploadedImages: new Array(),
       images: new Array(), // all uploaded images
       previewImage: "", // current preview image in Load dataset page
-      page: "load_dataset", // current page
-      currImage: { image: "", file: null }, // current image for annotation
+      page: "annotate", // current page
+      currImage: { image: "", name: "" }, // current image for annotation
       editing: false, // are we annotating?
       annotatedImages: new Array(), // all data (image + annotations)
       filename: "", // file name of a annotations file, we want to download
@@ -46,6 +47,20 @@ class App extends Component {
     this.interval = null;
   }
 
+  componentDidMount() {
+    if (this.state.page === "annotate"){
+      axios({
+        method:'GET',
+        url:'http://localhost:4000/images'
+      }).then(response => {
+        let images_data = response.data.images;
+        this.setState(prevState => ({ ...prevState, images: images_data, currImage: { image: images_data[0].path, name: images_data[0].name}}));
+      }).catch(err => {
+        console.error(err);
+      });
+    }
+  }
+
   handleReset = () => {
     this.handleCancelTraining();
     window.location.reload();
@@ -60,7 +75,7 @@ class App extends Component {
 
   handleServerUpload = () => {
     this.setState(prevState => ({ ...prevState, uploadingImages: true }));
-    let images = this.state.images;
+    let images = this.state.uploadedImages;
     console.log(images);
     if (images.length == 0) return;
 
@@ -75,22 +90,24 @@ class App extends Component {
       data: data
     }).then(response => {
       console.log(response);
-      this.setState(prevState => ({ ...prevState, uploadingImages: false }));
+      this.setState(prevState => ({ ...prevState, uploadingImages: false, page: "annotate" }));
     }).catch(e => {
       console.error(e);
+      this.setState(prevState => ({ ...prevState, uploadingImages: false, page:"annotate" }));
     });
   }
 
   handleImageSelected = (event) => {
     for (let file of event.target.files) {
-        if (this.state.images.length == 0){
-          // we dont yet have an image in our dataset
-          // so we set the preview image to the first one
-          this.setState(prevState => ({images: [...prevState.images, file], previewImage: event.target.files[0]}));
-        }
-        else{
-          this.setState(prevState => ({images: [...prevState.images, file], previewImage: prevState.previewImage}));
-        }
+        // if (this.state.images.length == 0){
+        //   // we dont yet have an image in our dataset
+        //   // so we set the preview image to the first one
+        //   // this.setState(prevState => ({images: [...prevState.images, file], previewImage: event.target.files[0]}));
+        // }
+        // else{
+        //   this.setState(prevState => ({images: [...prevState.images, file], previewImage: prevState.previewImage}));
+        // }
+        this.setState(prevState => ({ ...prevState, uploadedImages: [...prevState.uploadedImages, file] }));
     }
   };
 
@@ -99,7 +116,7 @@ class App extends Component {
   }
 
   handleAnnotateSelectedImage = (image) => {
-    this.setState(prevState => ({...prevState, currImage: { image:URL.createObjectURL(image), file: image } }));
+    this.setState(prevState => ({...prevState, currImage: { image: image.path, name: image.name } }));
   }
 
   handleDeleteDataset = () => {
@@ -275,21 +292,52 @@ class App extends Component {
   }
 
   updateAnnotatedImages = (currentState) => {
+    console.log(currentState);
     if (currentState.markers.length == 0) return;
-    const newAnnotatedImages = this.state.annotatedImages;
+    // const newAnnotatedImages = this.state.annotatedImages;
     const currImage = this.state.currImage;
 
-    for (let i = 0; i < newAnnotatedImages.length; i++){
-      if (newAnnotatedImages[i].image.file.name === currImage.file.name){
-        newAnnotatedImages[i].state = currentState;
-        this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
-        return;
-      }
-    }
+    // for (let i = 0; i < newAnnotatedImages.length; i++){
+    //   if (newAnnotatedImages[i].image.name === currImage.name){
+    //     newAnnotatedImages[i].state = currentState;
+    //     this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
+    //     return;
+    //   }
+    // }
 
     // image is not yet in annotatedImages...
-    newAnnotatedImages.push({image: currImage, state: currentState});
-    this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
+    // newAnnotatedImages.push({image: currImage, state: currentState});
+    // this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
+
+    let data = {state: currentState, image: currImage.name};
+
+    axios({
+      method: "POST",
+      url: "/annotations",
+      data: data
+    }).then(response => {
+      console.log(response);
+    }).catch(err => {
+      console.error(err);
+    });
+  }
+
+  getImageAnnotations = (image_name) => {
+    return new Promise( (resolve, reject) => {
+      axios({
+        method:'GET',
+        url: '/annotations/' + image_name
+      }).then(response => {
+        console.log(response);
+        if (response.data.state != null) {
+          resolve(response.data.state);
+        }
+      }).catch(err => {
+        console.error(err);
+        resolve(err);
+      });
+
+    });
   }
 
   showMarkerArea() {
@@ -315,12 +363,15 @@ class App extends Component {
       });
 
       this.markerArea.addEventListener('show', event => {
-        for (let i = 0; i < this.state.annotatedImages.length; i++){
-          if (this.state.currImage.file.name === this.state.annotatedImages[i].image.file.name){
-            console.log("že obstaja state");
-            this.markerArea.restoreState(this.state.annotatedImages[i].state);
-          }
-        }
+        this.getImageAnnotations(this.state.currImage.name).then(state => {
+          this.markerArea.restoreState(state);
+        });
+        // for (let i = 0; i < this.state.annotatedImages.length; i++){
+        //   if (this.state.currImage.name === this.state.annotatedImages[i].image.name){
+        //     console.log("že obstaja state");
+        //     this.markerArea.restoreState(this.state.annotatedImages[i].state);
+        //   }
+        // }
       });
 
       this.markerArea.addEventListener('markercreate', event => {
@@ -368,20 +419,89 @@ class App extends Component {
     }
   }
 
+  mainPage = () => {
+    return (
+        <Container fluid className="">
+          <Row>
+            <Col lg="9">
+              <div className="img-container mt-4 me-5">
+                <img ref={this.imgRef}
+                  className="slika"
+                  crossorigin="anonymous"
+                  src={this.state.currImage.image != "" ? this.state.currImage.image : ""}
+                  hidden={this.state.currImage.image == ""}
+                />
+              </div>
+            </Col>
+            <Col lg="3" className="toolbox">
+              
+              <Stack direction="horizontal" className="ms-auto me-auto mt-3">
+                <Button variant="outline-dark" className="me-auto ms-auto upload-btn" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
+                  <span hidden={!this.state.currentlyUploadingAnnotationsFile} className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                  Upload annotations file
+                </Button>
+                <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
+              </Stack>
+
+              <Stack direction='horizontal' gap="2" className="ms-5 me-5 mt-3">
+                  <Button variant="success" className="me-auto ms-auto start-btn" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.name == "" || this.state.currentlyUploadingAnnotationsFile}>
+                    Start
+                  </Button>
+                  <Button className="btn-danger ms-auto me-auto finish-btn" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
+              </Stack>
+
+              <Stack direction="horizontal" gap="3" className="ms-2 me-2 mt-3">
+                <Button variant="primary" className="me-auto ms-auto" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>
+                  <i className="bi bi-plus-square"></i>
+                </Button>
+                <Button variant="secondary" className="me-auto ms-auto" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>
+                  <i className="bi bi-cursor"></i>
+                  </Button>
+                <input type="checkbox" className="btn-check ms-auto me-auto" id="btn-check-2-outlined" onChange={e => {this.toggleInstantAnottations(e)}} disabled={!this.state.editing} />
+                <label className="btn btn-outline-secondary ms-auto me-auto" htmlFor="btn-check-2-outlined">
+                  <i className="bi bi-lightning"></i>
+                </label>
+                <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomIn(); }} disabled={!this.state.editing}>
+                  <i className="bi bi-zoom-in"></i>
+                </Button>
+                <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomOut(); }} disabled={!this.state.editing}>
+                  <i className="bi bi-zoom-out"></i>
+                </Button>
+              </Stack>
+
+              <h5 className="text-light mt-4 ms-5 me-5 info-text">Uploaded images</h5>
+              <h6 className="ms-5 mt-2 text-light info-text">Total images: {this.state.images.length}</h6>
+              {/* <h6 className="ms-5 mt-2 mb-2 text-light info-text">Total annotations: {10}</h6> */} {/* TODO */}
+              <ImageList
+                images={this.state.images}
+                onPreviewSelectedImage={this.handleAnnotateSelectedImage}
+              >
+              </ImageList>
+            </Col>
+          </Row>
+        </Container>
+    );
+  }
+
   pageDisplay = () => {
-    console.log(this.state.page);
     switch (this.state.page) {
       case "load_dataset":
         {
-          return (<LoadDataset onImageSelected={this.handleImageSelected} 
-            onPreviewSelectedImage={this.handlePreviewSelectedImage}
-            onDeleteDataset={this.handleDeleteDataset}
-            onUploadAnnotationsFile={this.handleUploadAnnotationsFile}
-            onServerUpload={this.handleServerUpload}
-            images={this.state.images}
-            uploadingImages={this.state.uploadingImages}
-            previewImage={this.state.previewImage}>
-          </LoadDataset> )
+          return (
+          <>
+            {this.mainPage()}
+            <LoadDataset
+              onImageSelected={this.handleImageSelected} 
+              onDeleteDataset={this.handleDeleteDataset}
+              onServerUpload={this.handleServerUpload}
+              images={this.state.images}
+              uploadedImages={this.state.uploadedImages}
+              uploadingImages={this.state.uploadingImages}
+              onClose={this.handleAnnotatePage}
+              show={this.state.page === "load_dataset"}>
+            </LoadDataset> 
+          </>
+          );
         }
       case "save_dataset":
         {
@@ -399,66 +519,9 @@ class App extends Component {
         {
           return (
             <div className="App">
-              <Container fluid className="">
-                <Row>
-                  <Col lg="9">
-                    <div className="img-container mt-4 me-5">
-                      <img ref={this.imgRef}
-                        className="slika"
-                        src={this.state.currImage.image != "" ? this.state.currImage.image : ""}
-                        hidden={this.state.currImage.image == ""}
-                      />
-                    </div>
-                  </Col>
-                  <Col lg="3" className="toolbox">
-                    
-                    <Stack direction="horizontal" className="ms-auto me-auto mt-3">
-                      <Button variant="outline-dark" className="me-auto ms-auto upload-btn" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
-                        <span hidden={!this.state.currentlyUploadingAnnotationsFile} class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                        Upload annotations file
-                      </Button>
-                      <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
-                    </Stack>
-
-                    <Stack direction='horizontal' gap="2" className="ms-5 me-5 mt-3">
-                        <Button variant="success" className="me-auto ms-auto start-btn" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.file == null || this.state.currentlyUploadingAnnotationsFile}>
-                          Start
-                        </Button>
-                        <Button className="btn-danger ms-auto me-auto finish-btn" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
-                    </Stack>
-
-                    <Stack direction="horizontal" gap="3" className="ms-2 me-2 mt-3">
-                      <Button variant="primary" className="me-auto ms-auto" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>
-                        <i class="bi bi-plus-square"></i>
-                      </Button>
-                      <Button variant="secondary" className="me-auto ms-auto" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>
-                        <i class="bi bi-cursor"></i>
-                        </Button>
-                      <input type="checkbox" class="btn-check ms-auto me-auto" id="btn-check-2-outlined" autocomplete="off" onChange={e => {this.toggleInstantAnottations(e)}} disabled={!this.state.editing} />
-                      <label class="btn btn-outline-secondary ms-auto me-auto" for="btn-check-2-outlined">
-                        <i class="bi bi-lightning"></i>
-                      </label>
-                      <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomIn(); }} disabled={!this.state.editing}>
-                        <i class="bi bi-zoom-in"></i>
-                      </Button>
-                      <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomOut(); }} disabled={!this.state.editing}>
-                        <i class="bi bi-zoom-out"></i>
-                      </Button>
-                    </Stack>
-
-                    <h5 className="text-light mt-4 ms-5 me-5 info-text">Uploaded images</h5>
-                    <h6 className="ms-5 mt-2 text-light info-text">Total images: {this.state.images.length}</h6>
-                    {/* <h6 className="ms-5 mt-2 mb-2 text-light info-text">Total annotations: {10}</h6> */} {/* TODO */}
-                    <ImageList
-                      images={this.state.images}
-                      onPreviewSelectedImage={this.handleAnnotateSelectedImage}
-                    >
-                    </ImageList>
-                  </Col>
-                </Row>
-              </Container>
+              {this.mainPage()}
             </div>
-          );
+          )
         }
       case 'train':
       {
