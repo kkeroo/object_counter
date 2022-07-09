@@ -119,6 +119,22 @@ app.get('/annotations/:image_name', (req, res) => {
   });
 });
 
+app.delete('/images', (req, res) => {
+  image_names = fs.readdir('./uploaded_images', (err, files) => {
+    if (err) return res.status(500).json({message: 'error'});
+
+    let file_paths = files.map(f => './uploaded_images/' + f);
+
+    file_paths.forEach(file_path => {
+      fs.unlink(file_path, () => {
+        console.log("File " + file_path + " deleted successfully.");
+      });
+    });
+
+    return res.json({ status: '200'});
+  });
+});
+
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
   });

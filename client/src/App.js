@@ -141,7 +141,15 @@ class App extends Component {
   }
 
   handleDeleteDataset = () => {
-    this.setState(prevState => ({images: new Array(), previewImage: ""}));
+    axios({
+      method:'DELETE',
+      url:'/images'
+    }).then(response => {
+      console.log(response);
+      this.loadServerImages();
+    }).catch(err => {
+      console.error(err);
+    });
   }
 
   handleLoadDatasetPage = () => {

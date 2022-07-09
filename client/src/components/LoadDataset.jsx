@@ -103,6 +103,9 @@ const LoadDataset = (props) => {
             </div>
         </Modal.Body>
         <Modal.Footer>
+            <Button variant="danger" onClick={props.onDeleteDataset} hidden={props.image_lenght == 0}>
+                Delete
+            </Button>
             <Button variant="secondary" onClick={props.onClose}>
                 Close
             </Button>
