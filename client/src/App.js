@@ -39,7 +39,8 @@ class App extends Component {
       trainTestSplit: false, // use a train and test split during training
       trainingFinished: false, // indicates if the current training proccess is finished
       jobCancelStatus: "", // status of a canceled job: success or error
-      uploadingImages: false
+      uploadingImages: false,
+      openDatasetModal: false
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -47,17 +48,36 @@ class App extends Component {
     this.interval = null;
   }
 
-  componentDidMount() {
-    if (this.state.page === "annotate"){
+  getServerImages = () => {
+    return new Promise ((resolve, reject) => {
       axios({
         method:'GET',
         url:'http://localhost:4000/images'
       }).then(response => {
-        let images_data = response.data.images;
-        this.setState(prevState => ({ ...prevState, images: images_data, currImage: { image: images_data[0].path, name: images_data[0].name}}));
+        resolve(response);
       }).catch(err => {
-        console.error(err);
+        reject(err);
       });
+    });
+  }
+
+  loadServerImages = () => {
+    this.getServerImages().then(response => {
+      let images_data = response.data.images;
+      if (images_data.length == 0) {
+        this.setState(prevState => ({ ...prevState, images: images_data }));
+      }
+      else{
+        this.setState(prevState => ({ ...prevState, images: images_data, currImage: { image: images_data[0].path, name: images_data[0].name}}));
+      }
+    }).catch(err => {
+      console.error(err);
+    });
+  }
+
+  componentDidMount() {
+    if (this.state.page === "annotate"){
+      this.loadServerImages();
     }
   }
 
@@ -91,6 +111,7 @@ class App extends Component {
     }).then(response => {
       console.log(response);
       this.setState(prevState => ({ ...prevState, uploadingImages: false, page: "annotate" }));
+      this.loadServerImages();
     }).catch(e => {
       console.error(e);
       this.setState(prevState => ({ ...prevState, uploadingImages: false, page:"annotate" }));
@@ -124,7 +145,8 @@ class App extends Component {
   }
 
   handleLoadDatasetPage = () => {
-    this.setState(prevState => ({...prevState, page: "load_dataset"}));
+    // this.setState(prevState => ({...prevState, page: "load_dataset"}));
+    this.setState(prevState => ({...prevState, openDatasetModal: true }));
   }
 
   handleAnnotatePage = () => {
@@ -422,6 +444,17 @@ class App extends Component {
   mainPage = () => {
     return (
         <Container fluid className="">
+          <LoadDataset
+              onImageSelected={this.handleImageSelected}
+              onDeleteDataset={this.handleDeleteDataset}
+              onServerUpload={this.handleServerUpload}
+              images={this.state.images}
+              image_lenght={this.state.images.length}
+              uploadedImages={this.state.uploadedImages}
+              uploadingImages={this.state.uploadingImages}
+              onClose={() => {this.setState(prevState => ({ ...prevState, openDatasetModal: false }))}}
+              show={this.state.openDatasetModal}>
+          </LoadDataset> 
           <Row>
             <Col lg="9">
               <div className="img-container mt-4 me-5">
@@ -490,8 +523,8 @@ class App extends Component {
           return (
           <>
             {this.mainPage()}
-            <LoadDataset
-              onImageSelected={this.handleImageSelected} 
+            {/* <LoadDataset
+              onImageSelected={this.handleImageSelected}
               onDeleteDataset={this.handleDeleteDataset}
               onServerUpload={this.handleServerUpload}
               images={this.state.images}
@@ -499,7 +532,7 @@ class App extends Component {
               uploadingImages={this.state.uploadingImages}
               onClose={this.handleAnnotatePage}
               show={this.state.page === "load_dataset"}>
-            </LoadDataset> 
+            </LoadDataset>  */}
           </>
           );
         }
