@@ -20,7 +20,6 @@ function Navigation(props){
                         <Nav.Link href="#3" onClick={() => {props.onLoadModel()}}>Load model</Nav.Link>
                         <Nav.Link href="#4" onClick={() => {props.onTrainModel()}}>Train</Nav.Link>
                         <Nav.Link href="#5" onClick={() => {props.onPredict()}}>Predict</Nav.Link>
-                        <Nav.Link className="text-warning" size="sm" onClick={() => {props.onReset()}}>Reset</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>
