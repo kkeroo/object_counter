@@ -17,7 +17,6 @@ function Navigation(props){
                     <Nav className="ms-auto">
                         <Nav.Link href="#" onClick={() => {props.onLoadDataset()}}>Load dataset</Nav.Link>
                         <Nav.Link href="#1" onClick={() => {props.onAnnotate()}} disabled={props.disableAnnotate}>Annotate</Nav.Link>
-                        <Nav.Link href="#2" onClick={() => {props.onSaveDataset()}} disabled={props.disableSaveDataset}>Save dataset</Nav.Link>
                         <Nav.Link href="#3" onClick={() => {props.onLoadModel()}}>Load model</Nav.Link>
                         <Nav.Link href="#4" onClick={() => {props.onTrainModel()}} disabled={props.disableTrainModel}>Train</Nav.Link>
                         <Nav.Link href="#5" onClick={() => {props.onPredict()}}>Predict</Nav.Link>

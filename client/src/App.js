@@ -32,7 +32,6 @@ class App extends Component {
       annotatedImages: new Array(), // all data (image + annotations)
       filename: "", // file name of a annotations file, we want to download
       filenameErrorMessage: "", // error message (eg. unvalid filename, contains . or space)
-      currentlyUploadingAnnotationsFile: false, // boolean, indicates if we are uploading annotatitions file
       toggleInstantAnottations: false, // boolean, idicates we if want to enable new marker creation after marker is created
       alreadyTraining: false, // boolean, idicates if we already sent data to backend...
       modelName: "", // name of a model we will download when training is finished
@@ -161,61 +160,8 @@ class App extends Component {
     this.setState(prevState => ({...prevState, page: "annotate"}));
   }
 
-  handleSaveDatasetPage = () => {
-    this.setState(prevState => ({ ...prevState, page: "save_dataset" }));
-  }
-
   handleFileNameEnter = (filename) => {
     this.setState(prevState => ({ ...prevState, filename: filename }));
-  }
-
-  handleSaveDataset = () => {
-    if (!this.fileNameValidation(this.state.filename)){
-      this.setState(prevState => ({ ...prevState, filenameErrorMessage: "Please enter valid file name." }));
-    }
-    else{
-      this.setState(prevState => ({ ...prevState, filenameErrorMessage: "" }));
-
-      let data = this.state.annotatedImages;
-      for (let i = 0; i < data.length; i++){
-        data[i].filename = data[i].image.file.name;
-      }
-      data = JSON.stringify(data);
-
-      let blob = new Blob([data], {type: "text/plain;charset=utf-8"});
-      let fn = this.state.filename + ".txt";
-      saveAs(blob, fn);
-
-      this.handleAnnotatePage();
-    }
-  }
-
-  handleFileRead = e => {
-    const content = this.filereader.result;
-    let data = JSON.parse(content);
-    let newAnnotatedImages = new Array();
-
-    // add uploaded state to every image match in our uploaded images
-    for (let imgs = 0; imgs < this.state.images.length; imgs++){
-      for (let states = 0; states < data.length; states++){
-        if (data[states].filename === this.state.images[imgs].name) {
-          // we have match
-          newAnnotatedImages.push({image: {image: URL.createObjectURL(this.state.images[imgs]), file: this.state.images[imgs]}, state: data[states].state});
-        }
-      }
-    }
-    this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }), () => {
-      // when annotations file is successfully proccessed and states are updated..
-      this.setState(prevState => ({ ...prevState, currentlyUploadingAnnotationsFile: false }));
-    });
-  }
-  
-  handleUploadAnnotationsFile = (e) => {
-    if (e.target.files[0] == undefined) return;
-    this.setState(prevState => ({ ...prevState, currentlyUploadingAnnotationsFile: true }));
-    this.filereader = new FileReader();
-    this.filereader.onloadend = this.handleFileRead;
-    this.filereader.readAsText(e.target.files[0]);
   }
 
   handleTrainPage = () => {
@@ -475,17 +421,9 @@ class App extends Component {
               </div>
             </Col>
             <Col lg="3" className="toolbox">
-              
-              <Stack direction="horizontal" className="ms-auto me-auto mt-3">
-                <Button variant="outline-dark" className="me-auto ms-auto upload-btn" disabled={this.state.images.length == 0} onClick={() => {document.getElementById("input-annotations-file").click()}}>
-                  <span hidden={!this.state.currentlyUploadingAnnotationsFile} className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                  Upload annotations file
-                </Button>
-                <input type="file" id="input-annotations-file" hidden onChange={(e) => {this.handleUploadAnnotationsFile(e)}}/>
-              </Stack>
 
               <Stack direction='horizontal' gap="2" className="ms-5 me-5 mt-3">
-                  <Button variant="success" className="me-auto ms-auto start-btn" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.name == "" || this.state.currentlyUploadingAnnotationsFile}>
+                  <Button variant="success" className="me-auto ms-auto start-btn" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.name == ""}>
                     Start
                   </Button>
                   <Button className="btn-danger ms-auto me-auto finish-btn" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
@@ -544,18 +482,6 @@ class App extends Component {
           </>
           );
         }
-      case "save_dataset":
-        {
-          return (
-            <SaveDataset
-              show={this.state.page === "save_dataset"}
-              onClose={this.handleAnnotatePage}
-              onFileNameEnter={this.handleFileNameEnter}
-              errorMessage={this.state.filenameErrorMessage}
-              onSaveDataset={this.handleSaveDataset}
-            ></SaveDataset>
-          )
-        }
       case "annotate":
         {
           return (
@@ -587,7 +513,6 @@ class App extends Component {
         <Navigation
           onLoadDataset={this.handleLoadDatasetPage}
           onAnnotate={this.handleAnnotatePage}
-          onSaveDataset={this.handleSaveDatasetPage}
           onTrainModel={this.handleTrainPage}
           onReset={this.handleReset}
           disableSaveDataset={this.state.annotatedImages.length == 0}
