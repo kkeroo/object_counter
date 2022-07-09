@@ -398,14 +398,14 @@ class App extends Component {
       this.markerArea = new markerjs2.MarkerArea(this.imgRef.current);
 
       // Settings
-      this.markerArea.settings.defaultColor = 'green';
+      this.markerArea.settings.defaultColor = 'red';
       this.markerArea.settings.defaultFillColor = 'transparent';
       this.markerArea.uiStyleSettings.toolbarHeight = 0;
       this.markerArea.uiStyleSettings.hideToolbar = true;
       this.markerArea.uiStyleSettings.hideBox = true;
       this.markerArea.zoomSteps = [1, 1.5, 2, 2.5, 3];
       this.markerArea.uiStyleSettings.zoomButtonVisible = true;
-      this.markerArea.settings.defaultStrokeWidth = 1;
+      this.markerArea.settings.defaultStrokeWidth = 2;
       //this.markerArea.settings.displayMode = 'popup';
 
       // attach an event handler to assign annotated image back to our image element
