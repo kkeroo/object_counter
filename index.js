@@ -7,6 +7,8 @@ var cors = require('cors');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const fs = require('fs');
+const axios = require('axios');
+const FormData = require('form-data');
 
 const PORT = process.env.PORT || 4000;
 const app = express();
@@ -15,19 +17,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(cookieParser());
-// app.use(compression());
+app.use(cookieParser());
+app.use(compression());
 app.use(cors());
-// app.use(cors({origin: true, credentials: true}));
+app.use(cors({origin: true, credentials: true}));
 
 // using https on production server
-if (process.env.NODE_ENV === "production") {
-  app.use((req, res, next) => {
-    if (req.header("x-forwarded-proto") !== "https")
-      res.redirect(`https://${req.header("host")}${req.url}`);
-    else next();
-  });
-}
+// if (process.env.NODE_ENV === "production") {
+//   app.use((req, res, next) => {
+//     if (req.header("x-forwarded-proto") !== "https")
+//       res.redirect(`https://${req.header("host")}${req.url}`);
+//     else next();
+//   });
+// }
 
 app.use(express.static(path.join(__dirname, 'client', 'build')));
 
@@ -68,17 +70,19 @@ app.get('/images/:image_name', (req, res) => {
 });
 
 app.get('/images', (req, res) => {
+  // getAllImagesWithAnnotations();
+  // const http = require('http');
+
+  // http.get('http://localhost:4200', res => {
+  //   console.log("aa");
+  // })
   image_names = fs.readdirSync('./uploaded_images');
   image_paths = new Array();
   image_names.forEach(file => {
     image_paths.push({name:file, path:'http://localhost:4000/images/'+file});
-    // image_paths.push(file);
   });
 
   res.json({ images: image_paths });
-  // image_paths.map(i => {
-  //   return res.sendFile(i, { root: './uploaded_images/'});
-  // })
 })
 
 app.post('/images', upload.array('images'), (req, res) => {
@@ -135,6 +139,62 @@ app.delete('/images', (req, res) => {
   });
 });
 
+const getAllImagesWithAnnotations = () => {
+  let images = new Array();
+  let annotations = new Array();
+
+  // read all annotations files into annotations array
+  // save annotation file's name and content
+  let annotations_list = fs.readdirSync('./uploaded_annotations');
+  annotations_list = annotations_list.map(f => './uploaded_annotations/' + f);
+  annotations_list.forEach(ann => {
+    let file = fs.readFileSync(ann);
+    file = JSON.parse(file);
+    let name = path.parse(ann).name;
+    annotations.push({ name: name, file: file });
+  });
+
+  data = new Array();
+  // read all images and keep only those which have their annotations file
+  fs.readdir('./uploaded_images', (err, files) => {
+    let file_paths = files.map(f => './uploaded_images/' + f);
+    
+    file_paths.forEach(file_path => {
+      annotations.forEach(ann => {
+        let image_name = path.parse(file_path).name;
+        if (ann.name === image_name){
+          // we have a match
+          let obj = { image_name: path.parse(file_path).base, width: ann.file.width, height: ann.file.height, markers: new Array() }
+          ann.file.markers.forEach(marker => {
+            obj.markers.push({left: marker.left, top: marker.top, width: marker.width, height: marker.height});
+          });
+          data.push(obj);
+        }
+      });
+    });
+
+    let a = {annotations: data};
+
+    // axios({
+      //   method:'POST',
+      //   url: "localhost:8000/anno/",
+      //   data: "aa"
+      // }).then(response => {
+        //   console.log(response);
+        // }).catch(err => {
+          //   console.error(err);
+    // });
+  });
+};
+
+// axios({
+//   method:"GET",
+//   url:"http://localhost:4200"
+// }).then(response => {
+//   console.log(response);
+// }).catch(err => {
+//   console.error(err);
+// });
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
   });

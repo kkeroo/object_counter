@@ -18,7 +18,7 @@ function Navigation(props){
                         <Nav.Link href="#" onClick={() => {props.onLoadDataset()}}>Load dataset</Nav.Link>
                         <Nav.Link href="#1" onClick={() => {props.onAnnotate()}} disabled={props.disableAnnotate}>Annotate</Nav.Link>
                         <Nav.Link href="#3" onClick={() => {props.onLoadModel()}}>Load model</Nav.Link>
-                        <Nav.Link href="#4" onClick={() => {props.onTrainModel()}} disabled={props.disableTrainModel}>Train</Nav.Link>
+                        <Nav.Link href="#4" onClick={() => {props.onTrainModel()}}>Train</Nav.Link>
                         <Nav.Link href="#5" onClick={() => {props.onPredict()}}>Predict</Nav.Link>
                         <Nav.Link className="text-warning" size="sm" onClick={() => {props.onReset()}}>Reset</Nav.Link>
                     </Nav>

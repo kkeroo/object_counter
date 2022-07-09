@@ -78,6 +78,14 @@ class App extends Component {
     if (this.state.page === "annotate"){
       this.loadServerImages();
     }
+    axios({
+      method:"get",
+      url:"http://localhost:4200"
+    }).then(response => {
+      console.log(response);
+    }).catch(err => {
+      console.error(err);
+    })
   }
 
   handleReset = () => {
@@ -153,7 +161,10 @@ class App extends Component {
 
   handleLoadDatasetPage = () => {
     // this.setState(prevState => ({...prevState, page: "load_dataset"}));
-    this.setState(prevState => ({...prevState, openDatasetModal: true }));
+    if (this.state.page !== "annotate"){
+      this.setState(prevState => ({...prevState,page: "annotate", openDatasetModal: true }));
+    }
+    else this.setState(prevState => ({...prevState, openDatasetModal: true }));
   }
 
   handleAnnotatePage = () => {
