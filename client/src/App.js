@@ -44,7 +44,8 @@ class App extends Component {
       openModelModal: false,
       selectedModel: null,
       model: null,
-      uploadingModel: false
+      uploadingModel: false,
+      totalMarkers: 0
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -417,6 +418,7 @@ class App extends Component {
       this.markerArea.addEventListener('show', event => {
         this.getImageAnnotations(this.state.currImage.name).then(state => {
           this.markerArea.restoreState(state);
+          this.setState(prevState => ({ ...prevState, totalMarkers: state.markers.length }));
         });
         // for (let i = 0; i < this.state.annotatedImages.length; i++){
         //   if (this.state.currImage.name === this.state.annotatedImages[i].image.name){
@@ -458,7 +460,7 @@ class App extends Component {
 
   finishEditing() {
     this.markerArea.startRenderAndClose();
-    this.setState(prevState => ({...prevState, editing: false}));
+    this.setState(prevState => ({...prevState, editing: false, totalMarkers: 0}));
   }
 
   toggleInstantAnottations = (e) => {
@@ -536,7 +538,7 @@ class App extends Component {
 
               <h5 className="text-light mt-4 ms-5 me-5 info-text">Uploaded images</h5>
               <h6 className="ms-5 mt-2 text-light info-text">Total images: {this.state.images.length}</h6>
-              {/* <h6 className="ms-5 mt-2 mb-2 text-light info-text">Total annotations: {10}</h6> */} {/* TODO */}
+              <h6 className="ms-5 mt-2 mb-2 text-light info-text">Total annotations: {this.state.totalMarkers}</h6>
               <ImageList
                 images={this.state.images}
                 onPreviewSelectedImage={this.handleAnnotateSelectedImage}
