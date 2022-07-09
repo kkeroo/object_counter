@@ -149,6 +149,13 @@ app.delete('/images', (req, res) => {
   });
 });
 
+app.get('/model', (req, res) => {
+  fs.readdir('./uploaded_models', (err, files) => {
+    if (files.length == 0) return res.json({ model: null });
+    else return res.json({ model: files[0] });
+  });
+});
+
 app.post('/model',uploadModel.single('model') , (req, res) => {
   res.send("done");
 });

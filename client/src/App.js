@@ -65,6 +65,19 @@ class App extends Component {
     });
   }
 
+  getServerModel = () => {
+    return new Promise ( (resolve, reject) => {
+      axios({
+        method: 'GET',
+        url:'/model'
+      }).then(response => {
+        resolve(response);
+      }).catch(err => {
+        reject(err);
+      });
+    });
+  }
+
   loadServerImages = () => {
     this.getServerImages().then(response => {
       let images_data = response.data.images;
@@ -79,23 +92,28 @@ class App extends Component {
     });
   }
 
+  loadServerModel = () => {
+    this.getServerModel().then(response => {
+      let model = response.data.model;
+      this.setState(prevState => ({ ...prevState, model: model }));
+    }).catch(err => {
+      console.error(err);
+    });
+  }
+
   componentDidMount() {
     if (this.state.page === "annotate"){
       this.loadServerImages();
+      this.loadServerModel();
     }
-    axios({
-      method:"get",
-      url:"http://localhost:4200"
-    }).then(response => {
-      console.log(response);
-    }).catch(err => {
-      console.error(err);
-    })
-  }
-
-  handleReset = () => {
-    this.handleCancelTraining();
-    window.location.reload();
+    // axios({
+    //   method:"get",
+    //   url:"http://localhost:4200"
+    // }).then(response => {
+    //   console.log(response);
+    // }).catch(err => {
+    //   console.error(err);
+    // })
   }
 
   fileNameValidation = (filename) => {
@@ -144,8 +162,11 @@ class App extends Component {
       data: data
     }).then(response => {
       console.log(response);
+      this.setState(prevState => ({ ...prevState, uploadingModel: false, page: "annotate" }));
+      this.loadServerModel();
     }).catch(err => {
       console.error(err);
+      this.setState(prevState => ({ ...prevState, uploadingModel: false, page: "annotate" }));
     });
   }
 
