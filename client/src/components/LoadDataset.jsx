@@ -109,7 +109,7 @@ const LoadDataset = (props) => {
             <Button variant="secondary" onClick={props.onClose}>
                 Close
             </Button>
-            <Button variant="primary" onClick={props.onServerUpload} disabled={props.uploadingImages}>
+            <Button variant="primary" onClick={props.onServerUpload} hidden={props.image_lenght > 0} disabled={props.uploadingImages}>
                 {props.uploadingImages ? "Uploading..." : "Upload"}
             </Button>
         </Modal.Footer>
