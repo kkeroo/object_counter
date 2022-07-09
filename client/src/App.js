@@ -17,6 +17,7 @@ import LoadDataset from './components/LoadDataset';
 import Navigation from './components/Navbar';
 import SaveDataset from './components/SaveDataset';
 import Train from './components/Train';
+import LoadModel from './components/LoadModel';
 
 class App extends Component {
   constructor(props){
@@ -39,7 +40,11 @@ class App extends Component {
       trainingFinished: false, // indicates if the current training proccess is finished
       jobCancelStatus: "", // status of a canceled job: success or error
       uploadingImages: false,
-      openDatasetModal: false
+      openDatasetModal: false,
+      openModelModal: false,
+      selectedModel: null,
+      model: null,
+      uploadingModel: false
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
@@ -125,6 +130,25 @@ class App extends Component {
     });
   }
 
+  handleUploadModel = () => {
+    this.setState(prevState => ({ ...prevState, uploadingModel: true }));
+    let model = this.state.selectedModel;
+    if (model == null) return;
+
+    let data = new FormData();
+    data.append('model', model);
+
+    axios({
+      method: "POST",
+      url:'/model',
+      data: data
+    }).then(response => {
+      console.log(response);
+    }).catch(err => {
+      console.error(err);
+    });
+  }
+
   handleImageSelected = (event) => {
     for (let file of event.target.files) {
         // if (this.state.images.length == 0){
@@ -138,6 +162,10 @@ class App extends Component {
         this.setState(prevState => ({ ...prevState, uploadedImages: [...prevState.uploadedImages, file] }));
     }
   };
+
+  handleModelSelected = (event) => {
+    this.setState(prevState => ({ ...prevState, selectedModel: event.target.files[0] }));
+  }
 
   handlePreviewSelectedImage = (image) => {
     this.setState(prevState => ({images: prevState.images, previewImage: image}));
@@ -160,7 +188,6 @@ class App extends Component {
   }
 
   handleLoadDatasetPage = () => {
-    // this.setState(prevState => ({...prevState, page: "load_dataset"}));
     if (this.state.page !== "annotate"){
       this.setState(prevState => ({...prevState,page: "annotate", openDatasetModal: true }));
     }
@@ -177,6 +204,11 @@ class App extends Component {
 
   handleTrainPage = () => {
     this.setState(prevState => ({ ...prevState, page:'train' }));
+  }
+
+  handleLoadModelPage = () => {
+    if (this.state.page !== "annotate") this.setState(prevState => ({ ...prevState, page: "annotate", openModelModal: true }));
+    else this.setState(prevState => ({ ...prevState, openModelModal: true }));
   }
 
   intervalFunc = () => {
@@ -420,6 +452,16 @@ class App extends Component {
               onClose={() => {this.setState(prevState => ({ ...prevState, openDatasetModal: false }))}}
               show={this.state.openDatasetModal}>
           </LoadDataset> 
+          <LoadModel
+            show={this.state.openModelModal}
+            onClose={() => {this.setState(prevState => ({ ...prevState, openModelModal: false }))}}
+            model={this.state.model}
+            onModelSelected={this.handleModelSelected}
+            onUploadModel={this.handleUploadModel}
+            onDeleteModel={this.handleDeleteModel}
+            uploadedModel={this.state.uploadingModel}
+          >
+          </LoadModel>
           <Row>
             <Col lg="9">
               <div className="img-container mt-4 me-5">
@@ -525,7 +567,7 @@ class App extends Component {
           onLoadDataset={this.handleLoadDatasetPage}
           onAnnotate={this.handleAnnotatePage}
           onTrainModel={this.handleTrainPage}
-          onReset={this.handleReset}
+          onLoadModel={this.handleLoadModelPage}
           disableSaveDataset={this.state.annotatedImages.length == 0}
           disableAnnotate={this.state.images.length == 0}
           disableTrainModel={this.state.annotatedImages.length == 0}

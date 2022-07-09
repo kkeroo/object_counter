@@ -57,8 +57,18 @@ const storage = multer.diskStorage({
   }
 });
 
+const modelStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploaded_models/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+});
+
 let upload = multer({ storage: storage })
 
+let uploadModel = multer({ storage: modelStorage });
 app.post('/', (req, res) => {
   console.log(req);
   res.send("hello");
@@ -137,6 +147,10 @@ app.delete('/images', (req, res) => {
 
     return res.json({ status: '200'});
   });
+});
+
+app.post('/model',uploadModel.single('model') , (req, res) => {
+  res.send("done");
 });
 
 const getAllImagesWithAnnotations = () => {
