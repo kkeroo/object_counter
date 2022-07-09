@@ -17,7 +17,7 @@ const LoadModel = (props) => {
                     </Form.Group>
                 </Form>
                 <div className="" hidden={props.model == null}>
-                    <p>Currently uploaded model: <strong>model.pt</strong></p>
+                    <p>Currently uploaded model: <strong>{props.model}</strong></p>
                 </div>
             </Modal.Body>
             <Modal.Footer>

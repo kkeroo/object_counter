@@ -170,6 +170,18 @@ class App extends Component {
     });
   }
 
+  handleDeleteModel = () => {
+    axios({
+      method:'DELETE',
+      url:'/model'
+    }).then(response => {
+      console.log(response);
+      this.loadServerModel();
+    }).catch(err => {
+      console.error(err);
+    });
+  }
+
   handleImageSelected = (event) => {
     for (let file of event.target.files) {
         // if (this.state.images.length == 0){

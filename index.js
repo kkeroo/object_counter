@@ -156,9 +156,25 @@ app.get('/model', (req, res) => {
   });
 });
 
-app.post('/model',uploadModel.single('model') , (req, res) => {
+app.post('/model', uploadModel.single('model') , (req, res) => {
   res.send("done");
 });
+
+app.delete('/model', (req, res) => {
+  fs.readdir('./uploaded_models', (err, files) => {
+    if (err) return res.status(500).json({message: 'error'});
+
+    let file_paths = files.map(f => './uploaded_models/' + f);
+
+    file_paths.forEach(file_path => {
+      fs.unlink(file_path, () => {
+        console.log("File " + file_path + " deleted successfully.");
+      });
+    });
+
+    return res.json({ status: '200'});
+  });
+})
 
 const getAllImagesWithAnnotations = () => {
   let images = new Array();
