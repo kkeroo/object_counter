@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(compression());
 app.use(cors());
-app.use(cors({origin: true, credentials: true}));
+// app.use(cors({origin: true, credentials: true}));
 
 // using https on production server
 // if (process.env.NODE_ENV === "production") {
@@ -145,6 +145,18 @@ app.delete('/images', (req, res) => {
       });
     });
 
+    anno_names = fs.readdir('./uploaded_annotations', (err, files) => {
+      if (err) return res.status(500).json({message: 'error'});
+
+      let anno_paths = files.map(f => './uploaded_annotations/' + f);
+
+      anno_paths.forEach(anno => {
+        fs.unlink(anno, () => {
+          console.log("File " + file_path + " deleted successfully.");
+        });
+      });
+    });
+
     return res.json({ status: '200'});
   });
 });
@@ -210,28 +222,22 @@ const getAllImagesWithAnnotations = () => {
       });
     });
 
-    let a = {annotations: data};
+    let a = {data: data};
 
-    // axios({
-      //   method:'POST',
-      //   url: "localhost:8000/anno/",
-      //   data: "aa"
-      // }).then(response => {
-        //   console.log(response);
-        // }).catch(err => {
-          //   console.error(err);
-    // });
+    axios({
+        method:'POST',
+        url: "http://localhost:8888",
+        data: a
+      }).then(response => {
+          console.log(response.data);
+        }).catch(err => {
+            console.error(err);
+    });
   });
 };
 
-// axios({
-//   method:"GET",
-//   url:"http://localhost:4200"
-// }).then(response => {
-//   console.log(response);
-// }).catch(err => {
-//   console.error(err);
-// });
+// getAllImagesWithAnnotations();
+
 app.listen(PORT, () => {
-    console.log(`Server listening on ${PORT}`);
-  });
+  console.log(`Server listening on ${PORT}`);
+});
