@@ -16,8 +16,18 @@ const Train = (props) => {
                 <Col>
                     <Form.Label>Model name</Form.Label>
                     <Form.Control disabled={props.alreadyTraining} onChange={e => { props.onEnterModelName(e)}} type="text" placeholder="Enter model name"/>
-                    <p className="text-danger mt-1">Please enter valid model name</p>
-                    <Form.Check disabled={props.alreadyTraining} type="checkbox" className="mt-3" onClick={() => {props.onTrainTestSplit()}} label="Train-Test split (70-30 split)"/>
+
+                    <Form.Label className="mt-2">Batch size</Form.Label>
+                    <Form.Control disabled={props.alreadyTraining} onChange={e => { props.onEnterBatchSize(e)}} type="number" placeholder="Enter batch size"/>
+
+                    <Form.Label className="mt-2">Number of Epochs</Form.Label>
+                    <Form.Control disabled={props.alreadyTraining} onChange={e => { props.onEnterEpochs(e)}} type="number" placeholder="Enter number of epochs"/>
+
+                    <Form.Label className="mt-2">Label</Form.Label>
+                    <Form.Control disabled={props.alreadyTraining} onChange={e => { props.onEnterLabel(e)}} type="text" placeholder="Enter name of objects"/>
+
+                    {/* <p className="text-danger mt-1">Please enter valid model name</p> */}
+                    {/* <Form.Check disabled={props.alreadyTraining} type="checkbox" className="mt-3" onClick={() => {props.onTrainTestSplit()}} label="Train-Test split (70-30 split)"/> */}
                     <Button variant="success" className="mt-3" onClick={() => {props.onTrain()}} disabled={props.alreadyTraining}>
                         <div hidden={!props.alreadyTraining} className="spinner-border spinner-border-sm me-2" role="status"></div>
                         {props.alreadyTraining ? "Training..." : "Train"}
@@ -30,8 +40,8 @@ const Train = (props) => {
                 <Col></Col>
                 <Col>
                     <h4>Training Finished</h4>
-                    <p>Train loss: 0.1245 |
-                    Validation loss: 0.23211
+                    <p>Train loss: {props.train_loss} |
+                    Validation loss: {props.valid_loss}
                     </p>
                     <Button variant="success" className="mt-2">
                         Download model

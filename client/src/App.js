@@ -36,8 +36,13 @@ class App extends Component {
       toggleInstantAnottations: false, // boolean, idicates we if want to enable new marker creation after marker is created
       alreadyTraining: false, // boolean, idicates if we already sent data to backend...
       modelName: "", // name of a model we will download when training is finished
+      batchSize: 0, // batch size used for training
+      epochs: 0, // number of epochs used during training
+      label: "", // label of a object we want to detect (count)
       trainTestSplit: false, // use a train and test split during training
       trainingFinished: false, // indicates if the current training proccess is finished
+      train_loss: 0,
+      valid_loss: 0,
       jobCancelStatus: "", // status of a canceled job: success or error
       uploadingImages: false,
       openDatasetModal: false,
@@ -248,7 +253,7 @@ class App extends Component {
   intervalFunc = () => {
     axios({
       method:'GET',
-      url: 'http://localhost:8000/job/'+this.state.job_id
+      url: '/jobs/'+this.state.job_id
     }).then(response => {
       console.log(response);
       if (response.data.job_status === "finished"){
@@ -256,14 +261,14 @@ class App extends Component {
         this.interval = null;
         // console.log(this.interval);
         // console.log("JOB FINISHED");
-        this.setState(prevState => ({ ...prevState, trainingFinished: true }));
+        this.setState(prevState => ({ ...prevState, trainingFinished: true, train_loss: response.data.result.train_loss, valid_loss: response.data.result.valid_loss }));
       }
     });
   }
 
   checkTraining = (job_id) => {
     this.setState(prevState => ({ ...prevState, job_id: job_id }), () => {
-      this.interval = setInterval(this.intervalFunc, 2000);
+      this.interval = setInterval(this.intervalFunc, 1000);
     });
   }
 
@@ -272,55 +277,84 @@ class App extends Component {
 
     this.setState(prevState => ({ ...prevState, alreadyTraining: true }));
 
-    let data = this.state.annotatedImages;
-    let images = new Array();
-    let anno = new Array();
-
-    for (let i = 0; i < data.length; i++){
-      images.push(data[i].image.file);
-      let ann = {width: data[i].state.width, height: data[i].state.height};
-      let ms = new Array();
-      for (let j = 0; j < data[i].state.markers.length; j++){
-        let m = {left: data[i].state.markers[j].left, top: data[i].state.markers[j].top, width: data[i].state.markers[j].width, height: data[i].state.markers[j].height};
-        ms.push(m);
-      }
-      ann.markers = ms;
-      anno.push(ann);
-    }
-
-    let formData = new FormData();
-    images.forEach(img => {
-      formData.append('images', img);
-      
-    });
+    let data = {
+      modelName: this.state.modelName,
+      batchSize: this.state.batchSize,
+      epochs: this.state.epochs,
+      label: this.state.label
+    };
 
     axios({
       method:'POST',
-      url: "http://localhost:8000",
-      data: formData
+      url:'/train',
+      data: data
     }).then(response => {
-      let user_hash = response.data.hash;
-      let data = {annotations: anno, user_hash: user_hash};
-      console.log(data);
-      axios({
-        method:'POST',
-        url: "http://localhost:8000/anno",
-        data: data
-      }).then(response => {
-        console.log(response);
-        // check if training is finished
-        this.checkTraining(response.data.job_id);
-      }).catch(error => {
-        console.error(error);
-      });
-    }).catch(error => {
-      console.error(error);
+      console.log(response.data);
+      this.checkTraining(response.data.job_id);
+    }).catch(err => {
+      console.error(err);
     });
+    // let data = this.state.annotatedImages;
+    // let images = new Array();
+    // let anno = new Array();
+
+    // for (let i = 0; i < data.length; i++){
+    //   images.push(data[i].image.file);
+    //   let ann = {width: data[i].state.width, height: data[i].state.height};
+    //   let ms = new Array();
+    //   for (let j = 0; j < data[i].state.markers.length; j++){
+    //     let m = {left: data[i].state.markers[j].left, top: data[i].state.markers[j].top, width: data[i].state.markers[j].width, height: data[i].state.markers[j].height};
+    //     ms.push(m);
+    //   }
+    //   ann.markers = ms;
+    //   anno.push(ann);
+    // }
+
+    // let formData = new FormData();
+    // images.forEach(img => {
+    //   formData.append('images', img);
+      
+    // });
+
+    // axios({
+    //   method:'POST',
+    //   url: "http://localhost:8000",
+    //   data: formData
+    // }).then(response => {
+    //   let user_hash = response.data.hash;
+    //   let data = {annotations: anno, user_hash: user_hash};
+    //   console.log(data);
+    //   axios({
+    //     method:'POST',
+    //     url: "http://localhost:8000/anno",
+    //     data: data
+    //   }).then(response => {
+    //     console.log(response);
+    //     // check if training is finished
+    //     this.checkTraining(response.data.job_id);
+    //   }).catch(error => {
+    //     console.error(error);
+    //   });
+    // }).catch(error => {
+    //   console.error(error);
+    // });
 
   }
 
   handleEnterModelName = (e) => {
     this.setState(prevState => ({ ...prevState, modelName: e.target.value }));
+  }
+
+  handleEnterBatchSize = (e) => {
+    this.setState(prevState => ({ ...prevState, batchSize: e.target.value }));
+  }
+
+  handleEnterEpochs = (e) => {
+    this.setState(prevState => ({ ...prevState, epochs: e.target.value }));
+  }
+
+  handleEnterLabel = (e) => {
+    this.setState(prevState => ({ ...prevState, label: e.target.value }));
   }
 
   handleTrainTestSplit = () => {
@@ -582,12 +616,17 @@ class App extends Component {
       {
         return <Train
         onEnterModelName={this.handleEnterModelName}
+        onEnterBatchSize={this.handleEnterBatchSize}
+        onEnterEpochs={this.handleEnterEpochs}
+        onEnterLabel={this.handleEnterLabel}
         onTrainTestSplit={this.handleTrainTestSplit}
         onTrain={this.handleTrainModel}
         onCancelTraining={this.handleCancelTraining}
         alreadyTraining={this.state.alreadyTraining}
         trainingFinished={this.state.trainingFinished}
         jobCancelStatus={this.state.jobCancelStatus}
+        valid_loss={this.state.valid_loss}
+        train_loss={this.state.train_loss}
         ></Train>
       }
       default:

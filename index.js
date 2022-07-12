@@ -186,9 +186,19 @@ app.delete('/model', (req, res) => {
 
     return res.json({ status: '200'});
   });
-})
+});
 
-const getAllImagesWithAnnotations = () => {
+app.post('/train', (req, res) => {
+  console.log(req.body);
+  let modelName = req.body.modelName;
+  let batchSize = req.body.batchSize;
+  let epochs = req.body.epochs;
+  let label = req.body.label;
+  // getAllImagesWithAnnotations(modelName, batchSize, epochs, label, res);
+  // return res.json({ status: "success"});
+// });
+
+// const getAllImagesWithAnnotations = (modelName, batchSize, epochs, label, res) => {
   let images = new Array();
   let annotations = new Array();
 
@@ -222,7 +232,7 @@ const getAllImagesWithAnnotations = () => {
       });
     });
 
-    let a = {data: data};
+    let a = {data: data, modelName: modelName, epochs: epochs, batchSize: batchSize, label:label};
 
     axios({
         method:'POST',
@@ -230,11 +240,30 @@ const getAllImagesWithAnnotations = () => {
         data: a
       }).then(response => {
           console.log(response.data);
+          return res.json({ status: "success", job_id: response.data.job_id });
         }).catch(err => {
             console.error(err);
+            return res.json({ status: "error" });
     });
   });
-};
+});
+
+app.get('/jobs/:job_id', (req, res) => {
+  axios({
+    method:'GET',
+    url:'http://localhost:8888/jobs/'+req.params.job_id
+  }).then(response => {
+    if (response.data.job_status !== "finished"){
+      return res.json({job_status: response.data.job_status});
+    }
+    else{
+      return res.json({job_status: response.data.job_status, result: response.data.result});
+    }
+  }).catch(err => {
+    console.error(err);
+    return res.json({status: 'error'});
+  });
+})
 
 // getAllImagesWithAnnotations();
 
