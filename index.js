@@ -152,7 +152,7 @@ app.delete('/images', (req, res) => {
 
       anno_paths.forEach(anno => {
         fs.unlink(anno, () => {
-          console.log("File " + file_path + " deleted successfully.");
+          console.log("File " + anno + " deleted successfully.");
         });
       });
     });
