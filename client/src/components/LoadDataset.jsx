@@ -95,7 +95,7 @@ const LoadDataset = (props) => {
             <Form onSubmit={props.onSaveDataset} hidden={props.image_lenght != 0}>
                 <Form.Group>
                     <Form.Label>Upload dataset on server</Form.Label>
-                    <Form.Control required type="file" multiple accept=".jpg" onChange={e => { props.onImageSelected(e) }}/>
+                    <Form.Control required type="file" multiple accept="image/jpg, image/png" onChange={e => { props.onImageSelected(e) }}/>
                 </Form.Group>
             </Form>
             <div className="" hidden={props.image_lenght == 0}>
