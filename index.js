@@ -13,6 +13,9 @@ const FormData = require('form-data');
 const PORT = process.env.PORT || 4000;
 const app = express();
 
+let currentlyTraining = false;
+let jobId = '';
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(logger('dev'));
 app.use(express.json());
@@ -188,6 +191,10 @@ app.delete('/model', (req, res) => {
   });
 });
 
+app.get('/train', (req, res) => {
+  res.json({ currentlyTraining: currentlyTraining, job_id: jobId });
+});
+
 app.post('/train', (req, res) => {
   console.log(req.body);
   let modelName = req.body.modelName;
@@ -240,6 +247,8 @@ app.post('/train', (req, res) => {
         data: a
       }).then(response => {
           console.log(response.data);
+          currentlyTraining = true;
+          jobId = response.data.job_id;
           return res.json({ status: "success", job_id: response.data.job_id });
         }).catch(err => {
             console.error(err);
@@ -258,6 +267,8 @@ app.get('/jobs/:job_id', (req, res) => {
     }
     else{
       getModel();
+      currentlyTraining = false;
+      jobId = '';
       return res.json({job_status: response.data.job_status, result: response.data.result});
     }
   }).catch(err => {
@@ -271,6 +282,8 @@ app.delete('/jobs/:job_id', (req, res) => {
     method:'delete',
     url:'http://localhost:8888/jobs/'+req.params.job_id
   }).then(response => {
+    currentlyTraining = false;
+    jobId = '';
     return res.json({status: response.data.status})
   }).catch(err => {
     console.error(err);

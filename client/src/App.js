@@ -35,6 +35,7 @@ class App extends Component {
       filenameErrorMessage: "", // error message (eg. unvalid filename, contains . or space)
       toggleInstantAnottations: false, // boolean, idicates we if want to enable new marker creation after marker is created
       alreadyTraining: false, // boolean, idicates if we already sent data to backend...
+      job_id: '', // job id of redis queue job used for machine lerning algo
       modelName: "", // name of a model we will download when training is finished
       batchSize: 0, // batch size used for training
       epochs: 0, // number of epochs used during training
@@ -84,6 +85,19 @@ class App extends Component {
     });
   }
 
+  getTrainingStatus = () => {
+    return new Promise ( (resolve, reject) => {
+      axios({
+        method:'GET',
+        url:'/train'
+      }).then(response => {
+        resolve(response);
+      }).catch(err => {
+        reject(err);
+      });
+    });
+  }
+
   loadServerImages = () => {
     this.getServerImages().then(response => {
       let images_data = response.data.images;
@@ -107,10 +121,19 @@ class App extends Component {
     });
   }
 
+  loadTrainingStatus = () => {
+    this.getTrainingStatus().then(response => {
+      let currentlyTraining = response.data.currentlyTraining;
+      let job_id = response.data.job_id
+      this.setState(prevState => ({ ...prevState, alreadyTraining: currentlyTraining, job_id: job_id }));
+    });
+  }
+
   componentDidMount() {
     if (this.state.page === "annotate"){
       this.loadServerImages();
       this.loadServerModel();
+      this.loadTrainingStatus();
     }
     // axios({
     //   method:"get",
