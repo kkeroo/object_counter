@@ -13,7 +13,7 @@ const LoadModel = (props) => {
                 <Form hidden={props.model != null}>
                     <Form.Group>
                         <Form.Label>Upload trained model on server</Form.Label>
-                        <Form.Control required type="file" accept=".jpg" onChange={e => { props.onModelSelected(e) }}/>
+                        <Form.Control required type="file" accept=".pt, .pth" onChange={e => { props.onModelSelected(e) }}/>
                     </Form.Group>
                 </Form>
                 <div className="" hidden={props.model == null}>
