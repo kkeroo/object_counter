@@ -257,6 +257,7 @@ app.get('/jobs/:job_id', (req, res) => {
       return res.json({job_status: response.data.job_status});
     }
     else{
+      getModel();
       return res.json({job_status: response.data.job_status, result: response.data.result});
     }
   }).catch(err => {
@@ -277,6 +278,18 @@ app.delete('/jobs/:job_id', (req, res) => {
   });
 });
 
+const getModel = () => {
+  axios({
+    method:'GET',
+    url:'http://localhost:8888/',
+    responseType: 'blob'
+  }).then(response => {
+    fs.writeFile('./uploaded_models/model.pt', response.data, (err) => {
+      if (err) return console.err(err);
+      console.log("Model has been saved.");
+    });
+  });
+}
 // getAllImagesWithAnnotations();
 
 app.listen(PORT, () => {
