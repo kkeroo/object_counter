@@ -263,7 +263,19 @@ app.get('/jobs/:job_id', (req, res) => {
     console.error(err);
     return res.json({status: 'error'});
   });
-})
+});
+
+app.delete('/jobs/:job_id', (req, res) => {
+  axios({
+    method:'delete',
+    url:'http://localhost:8888/jobs/'+req.params.job_id
+  }).then(response => {
+    return res.json({status: response.data.status})
+  }).catch(err => {
+    console.error(err);
+    return res.json({status: 'error'});
+  });
+});
 
 // getAllImagesWithAnnotations();
 

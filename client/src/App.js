@@ -364,11 +364,11 @@ class App extends Component {
   handleCancelTraining = () => {
     axios({
       method:'DELETE',
-      url: 'http://localhost:8000/job/'+this.state.job_id
+      url: '/jobs/'+this.state.job_id
     }).then(response => {
       clearInterval(this.interval);
       this.interval = null;
-      this.setState(prevState => ({ ...prevState, alreadyTraining: false, modelName: "", trainTestSplit: false, trainingFinished: false, jobCancelStatus: response.data.status }));
+      this.setState(prevState => ({ ...prevState, alreadyTraining: false, modelName: "", batchSize: 0, epochs: 0, label: "", trainTestSplit: false, trainingFinished: false, jobCancelStatus: response.data.status }));
       const timer = setTimeout(() => {
         this.setState(prevState => ({ ...prevState, jobCancelStatus: "" }));
         clearTimeout(timer);
