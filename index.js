@@ -266,7 +266,7 @@ app.get('/jobs/:job_id', (req, res) => {
       return res.json({job_status: response.data.job_status});
     }
     else{
-      getModel();
+      //getModel();
       currentlyTraining = false;
       jobId = '';
       return res.json({job_status: response.data.job_status, result: response.data.result});
@@ -294,8 +294,7 @@ app.delete('/jobs/:job_id', (req, res) => {
 const getModel = () => {
   axios({
     method:'GET',
-    url:'http://localhost:8888/',
-    responseType: 'blob'
+    url:'http://localhost:8888/'
   }).then(response => {
     fs.writeFile('./uploaded_models/model.pt', response.data, (err) => {
       if (err) return console.err(err);

@@ -43,7 +43,7 @@ const Train = (props) => {
                     <p>Train loss: {props.train_loss} |
                     Validation loss: {props.valid_loss}
                     </p>
-                    <Button variant="success" className="mt-2">
+                    <Button href="http://localhost:8888/" download="model.pt" variant="success" className="mt-2">
                         Download model
                     </Button>
                 </Col>

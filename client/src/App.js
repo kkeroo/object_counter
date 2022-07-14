@@ -401,6 +401,17 @@ class App extends Component {
     })
   }
 
+  handleDownloadModel = () => {
+    axios({
+      method:'GET',
+      url: '/trained_model'
+    }).then(response => {
+      console.log(response.headers);
+    }).catch(err => {
+      console.error(err);
+    });
+  }
+
   updateAnnotatedImages = (currentState) => {
     console.log(currentState);
     if (currentState.markers.length == 0) return;
@@ -645,6 +656,7 @@ class App extends Component {
         onTrainTestSplit={this.handleTrainTestSplit}
         onTrain={this.handleTrainModel}
         onCancelTraining={this.handleCancelTraining}
+        onDownloadModel={this.handleDownloadModel}
         alreadyTraining={this.state.alreadyTraining}
         trainingFinished={this.state.trainingFinished}
         jobCancelStatus={this.state.jobCancelStatus}
