@@ -18,6 +18,7 @@ import Navigation from './components/Navbar';
 import SaveDataset from './components/SaveDataset';
 import Train from './components/Train';
 import LoadModel from './components/LoadModel';
+import Predict from './components/Predict'
 
 class App extends Component {
   constructor(props){
@@ -25,6 +26,7 @@ class App extends Component {
     // page is name of the page (link in navbar), can be: load_dataset, annotate, save, load_model, train, predict
     this.state = {
       uploadedImages: new Array(),
+      uploadedImagesPrediction: new Array(),
       images: new Array(), // all uploaded images
       previewImage: "", // current preview image in Load dataset page
       page: "annotate", // current page
@@ -47,6 +49,9 @@ class App extends Component {
       jobCancelStatus: "", // status of a canceled job: success or error
       uploadingImages: false,
       openDatasetModal: false,
+      labelPrediction: "",
+      predictErrorMessage: "",
+      detectionThreshold: null,
       openModelModal: false,
       selectedModel: null,
       model: null,
@@ -213,17 +218,16 @@ class App extends Component {
 
   handleImageSelected = (event) => {
     for (let file of event.target.files) {
-        // if (this.state.images.length == 0){
-        //   // we dont yet have an image in our dataset
-        //   // so we set the preview image to the first one
-        //   // this.setState(prevState => ({images: [...prevState.images, file], previewImage: event.target.files[0]}));
-        // }
-        // else{
-        //   this.setState(prevState => ({images: [...prevState.images, file], previewImage: prevState.previewImage}));
-        // }
         this.setState(prevState => ({ ...prevState, uploadedImages: [...prevState.uploadedImages, file] }));
     }
   };
+
+  handleImageSelectedPrediction = (event) => {
+    console.log("asd");
+    for (let file of event.target.files) {
+      this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: [...prevState.uploadedImagesPrediction, file] }));
+    }
+  }
 
   handleModelSelected = (event) => {
     this.setState(prevState => ({ ...prevState, selectedModel: event.target.files[0] }));
@@ -271,6 +275,10 @@ class App extends Component {
   handleLoadModelPage = () => {
     if (this.state.page !== "annotate") this.setState(prevState => ({ ...prevState, page: "annotate", openModelModal: true }));
     else this.setState(prevState => ({ ...prevState, openModelModal: true }));
+  }
+
+  handleLoadPredictPage = () => {
+    this.setState(prevState => ({ ...prevState, page: 'predict' }));
   }
 
   intervalFunc = () => {
@@ -380,6 +388,15 @@ class App extends Component {
     this.setState(prevState => ({ ...prevState, label: e.target.value }));
   }
 
+  handleEnterLabelPrediction = (e) => {
+    this.setState(prevState => ({ ...prevState, labelPrediction: e.target.value }));
+  }
+
+
+  handleEnterDetectionThreshold = (e) => {
+    this.setState(prevState => ({ ...prevState, detectionThreshold: e.target.value }));
+  }
+
   handleTrainTestSplit = () => {
     this.setState(prevState => ({ ...prevState, trainTestSplit: !this.state.trainTestSplit }));
   }
@@ -410,6 +427,32 @@ class App extends Component {
     }).catch(err => {
       console.error(err);
     });
+  }
+
+  handlePredict = () => {
+    let threshold = this.state.detectionThreshold;
+    let uploadedImages = this.state.uploadedImagesPrediction;
+    let model = this.state.model;
+    let label = this.state.labelPrediction;
+
+    console.log("asd");
+    if (threshold < 0 || threshold > 1 || threshold == null) {
+      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please choose value of detection threshold between 0 and 1."}));
+      return;
+    }
+    if (uploadedImages.length == 0){
+      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please upload images."}));
+      return;
+    }
+    if (model == null){
+      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please upload model."}));
+      return;
+    }
+    if (label == ""){
+      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please enter label of object"}));
+      return;
+    }
+    this.setState(prevState => ({ ...prevState, predictErrorMessage: ""}));
   }
 
   updateAnnotatedImages = (currentState) => {
@@ -664,6 +707,22 @@ class App extends Component {
         train_loss={this.state.train_loss}
         ></Train>
       }
+      case 'predict':
+      {
+        return <Predict
+          show={this.state.page === 'predict'}
+          onClose={() => {this.setState(prevState => ({ ...prevState, page: 'annotate' }))}}
+          onImageSelected={this.handleImageSelectedPrediction}
+          onDeleteDataset={this.handleDeleteDatasetPrediction}
+          onEnterLabel={this.handleEnterLabelPrediction}
+          onEnterDetectionThreshold={this.handleEnterDetectionThreshold}
+          onPredict={this.handlePredict}
+          image_lenght={this.state.uploadedImagesPrediction.length}
+          model={this.state.model}
+          errorMessage={this.state.predictErrorMessage}
+        >
+        </Predict>
+      }
       default:
         break;
     }
@@ -677,6 +736,7 @@ class App extends Component {
           onAnnotate={this.handleAnnotatePage}
           onTrainModel={this.handleTrainPage}
           onLoadModel={this.handleLoadModelPage}
+          onPredict={this.handleLoadPredictPage}
           disableSaveDataset={this.state.annotatedImages.length == 0}
           disableAnnotate={this.state.images.length == 0}
           disableTrainModel={this.state.annotatedImages.length == 0}

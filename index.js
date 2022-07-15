@@ -82,6 +82,11 @@ app.get('/images/:image_name', (req, res) => {
   res.sendFile(image_name, {root: './uploaded_images/'});
 });
 
+app.get('/models/:model_name', (req, res) => {
+  let model_name = req.params.model_name;
+  res.sendFile(model_name, {root: './uploaded_models/'});
+})
+
 app.get('/images', (req, res) => {
   // getAllImagesWithAnnotations();
   // const http = require('http');
