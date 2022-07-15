@@ -14,7 +14,8 @@ const PORT = process.env.PORT || 4000;
 const app = express();
 
 let currentlyTraining = false;
-let jobId = '';
+let jobId_training = '';
+let jobId_predict = '';
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(logger('dev'));
@@ -94,6 +95,11 @@ app.get('/images/:image_name', (req, res) => {
   res.sendFile(image_name, {root: './uploaded_images/training/'});
 });
 
+app.get('/images/prediction/:image_name', (req, res) => {
+  let image_name = req.params.image_name;
+  res.sendFile(image_name, {root: './uploaded_images/prediction/'});
+});
+
 app.get('/models/:model_name', (req, res) => {
   let model_name = req.params.model_name;
   res.sendFile(model_name, {root: './uploaded_models/'});
@@ -121,6 +127,28 @@ app.post('/images', upload.array('images'), (req, res) => {
 
 app.post('/predict', predUpload.array('images'), (req, res) => {
   console.log(req.body);
+  let threshold = req.body.threshold;
+  let label = req.body.label;
+  let model = req.body.model;
+
+  let obj = {
+    threshold: threshold,
+    label: label,
+    model: model
+  };
+
+  fs.readdir('./uploaded_images/prediction/', (err, files) => {
+    obj.images = files
+    axios({
+      method:'POST',
+      url:'http://localhost:8888/predict/',
+      data: obj
+    }).then(response => {
+      console.log(response.data);
+    }).catch(err => {
+      console.error(err);
+    });
+  });
   res.json({status: 200 });
 });
 
@@ -230,7 +258,7 @@ app.delete('/model', (req, res) => {
 });
 
 app.get('/train', (req, res) => {
-  res.json({ currentlyTraining: currentlyTraining, job_id: jobId });
+  res.json({ currentlyTraining: currentlyTraining, job_id: jobId_training });
 });
 
 app.post('/train', (req, res) => {
@@ -286,7 +314,7 @@ app.post('/train', (req, res) => {
       }).then(response => {
           console.log(response.data);
           currentlyTraining = true;
-          jobId = response.data.job_id;
+          jobId_training = response.data.job_id;
           return res.json({ status: "success", job_id: response.data.job_id });
         }).catch(err => {
             console.error(err);
@@ -306,7 +334,7 @@ app.get('/jobs/:job_id', (req, res) => {
     else{
       //getModel();
       currentlyTraining = false;
-      jobId = '';
+      jobId_training = '';
       return res.json({job_status: response.data.job_status, result: response.data.result});
     }
   }).catch(err => {
@@ -321,7 +349,7 @@ app.delete('/jobs/:job_id', (req, res) => {
     url:'http://localhost:8888/jobs/'+req.params.job_id
   }).then(response => {
     currentlyTraining = false;
-    jobId = '';
+    jobId_training = '';
     return res.json({status: response.data.status})
   }).catch(err => {
     console.error(err);
