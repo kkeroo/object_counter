@@ -453,6 +453,25 @@ class App extends Component {
       return;
     }
     this.setState(prevState => ({ ...prevState, predictErrorMessage: ""}));
+
+    let formData = new FormData();
+    uploadedImages.forEach(img => {
+      formData.append('images', img);
+    });
+
+    formData.append('threshold', threshold);
+    formData.append('model', model);
+    formData.append('label', label);
+
+    axios({
+      method:'POST',
+      url:'/predict',
+      data: formData
+    }).then(response => {
+      console.log(response);
+    }).catch(err => {
+      console.error(err);
+    });
   }
 
   updateAnnotatedImages = (currentState) => {

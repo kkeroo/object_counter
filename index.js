@@ -51,11 +51,20 @@ app.use("/", (req, res, next) => {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploaded_images/');
+    cb(null, 'uploaded_images/training/');
   },
   filename: (req, file, cb) => {
     console.log(file);
     // cb(null, file.fieldname + '-' + Date.now() + '.jpg');
+    cb(null, file.originalname);
+  }
+});
+
+const predictionStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploaded_images/prediction/');
+  },
+  filename: (req, file, cb) => {
     cb(null, file.originalname);
   }
 });
@@ -69,9 +78,12 @@ const modelStorage = multer.diskStorage({
   }
 });
 
-let upload = multer({ storage: storage })
+let upload = multer({ storage: storage });
+
+let predUpload = multer({ storage: predictionStorage });
 
 let uploadModel = multer({ storage: modelStorage });
+
 app.post('/', (req, res) => {
   console.log(req);
   res.send("hello");
@@ -79,7 +91,7 @@ app.post('/', (req, res) => {
 
 app.get('/images/:image_name', (req, res) => {
   let image_name = req.params.image_name;
-  res.sendFile(image_name, {root: './uploaded_images/'});
+  res.sendFile(image_name, {root: './uploaded_images/training/'});
 });
 
 app.get('/models/:model_name', (req, res) => {
@@ -94,7 +106,7 @@ app.get('/images', (req, res) => {
   // http.get('http://localhost:4200', res => {
   //   console.log("aa");
   // })
-  image_names = fs.readdirSync('./uploaded_images');
+  image_names = fs.readdirSync('./uploaded_images/training/');
   image_paths = new Array();
   image_names.forEach(file => {
     image_paths.push({name:file, path:'http://localhost:4000/images/'+file});
@@ -105,7 +117,12 @@ app.get('/images', (req, res) => {
 
 app.post('/images', upload.array('images'), (req, res) => {
   res.send("done");
-})
+});
+
+app.post('/predict', predUpload.array('images'), (req, res) => {
+  console.log(req.body);
+  res.json({status: 200 });
+});
 
 app.post('/annotations', (req, res) => {
   let state = JSON.stringify(req.body.state);
@@ -142,10 +159,10 @@ app.get('/annotations/:image_name', (req, res) => {
 });
 
 app.delete('/images', (req, res) => {
-  image_names = fs.readdir('./uploaded_images', (err, files) => {
+  image_names = fs.readdir('./uploaded_images/training', (err, files) => {
     if (err) return res.status(500).json({message: 'error'});
 
-    let file_paths = files.map(f => './uploaded_images/' + f);
+    let file_paths = files.map(f => './uploaded_images/training/' + f);
 
     file_paths.forEach(file_path => {
       fs.unlink(file_path, () => {
@@ -227,8 +244,8 @@ app.post('/train', (req, res) => {
 
   data = new Array();
   // read all images and keep only those which have their annotations file
-  fs.readdir('./uploaded_images', (err, files) => {
-    let file_paths = files.map(f => './uploaded_images/' + f);
+  fs.readdir('./uploaded_images/training/', (err, files) => {
+    let file_paths = files.map(f => './uploaded_images/training/' + f);
     
     file_paths.forEach(file_path => {
       annotations.forEach(ann => {
