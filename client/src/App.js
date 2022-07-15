@@ -464,11 +464,18 @@ class App extends Component {
     formData.append('label', label);
 
     axios({
-      method:'POST',
-      url:'/predict',
-      data: formData
+      method:"DELETE",
+      url:'/predict/images'
     }).then(response => {
-      console.log(response);
+      axios({
+        method:'POST',
+        url:'/predict',
+        data: formData
+      }).then(response => {
+        console.log(response);
+      }).catch(err => {
+        console.error(err);
+      });
     }).catch(err => {
       console.error(err);
     });
