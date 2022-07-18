@@ -18,7 +18,7 @@ import Navigation from './components/Navbar';
 import SaveDataset from './components/SaveDataset';
 import Train from './components/Train';
 import LoadModel from './components/LoadModel';
-import Predict from './components/Predict'
+import Predict from './components/Predict';
 
 class App extends Component {
   constructor(props){
@@ -37,13 +37,16 @@ class App extends Component {
       filenameErrorMessage: "", // error message (eg. unvalid filename, contains . or space)
       toggleInstantAnottations: false, // boolean, idicates we if want to enable new marker creation after marker is created
       alreadyTraining: false, // boolean, idicates if we already sent data to backend...
+      alreadyPredicting: false,
       job_id: '', // job id of redis queue job used for machine lerning algo
+      job_id_predict: '',
       modelName: "", // name of a model we will download when training is finished
       batchSize: 0, // batch size used for training
       epochs: 0, // number of epochs used during training
       label: "", // label of a object we want to detect (count)
       trainTestSplit: false, // use a train and test split during training
       trainingFinished: false, // indicates if the current training proccess is finished
+      predictingFinished: false,
       train_loss: 0,
       valid_loss: 0,
       jobCancelStatus: "", // status of a canceled job: success or error
@@ -56,12 +59,15 @@ class App extends Component {
       selectedModel: null,
       model: null,
       uploadingModel: false,
-      totalMarkers: 0
+      totalMarkers: 0,
+      predictedImage: "",
+      result: new Array()
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
     this.filereader = null;
     this.interval = null;
+    this.intervalPred = null;
   }
 
   getServerImages = () => {
@@ -103,6 +109,19 @@ class App extends Component {
     });
   }
 
+  getPredictingStatus = () => {
+    return new Promise ( (resolve, reject) => {
+      axios({
+        method:'GET',
+        url:'/predict'
+      }).then(response => {
+        resolve(response);
+      }).catch(err => {
+        reject(err);
+      });
+    });
+  }
+
   loadServerImages = () => {
     this.getServerImages().then(response => {
       let images_data = response.data.images;
@@ -134,11 +153,24 @@ class App extends Component {
     });
   }
 
+  loadPredictingStatus = () => {
+    this.getPredictingStatus().then(response => {
+      console.log(response.data);
+      let currentlyPredicting = response.data.currentlyPredicting;
+      let job_id = response.data.job_id
+      if (currentlyPredicting){
+        this.checkPredicting(job_id);
+      }
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: currentlyPredicting, job_id_predict: job_id }));
+    });
+  }
+
   componentDidMount() {
     if (this.state.page === "annotate"){
       this.loadServerImages();
       this.loadServerModel();
       this.loadTrainingStatus();
+      this.loadPredictingStatus();
     }
     // axios({
     //   method:"get",
@@ -223,18 +255,19 @@ class App extends Component {
   };
 
   handleImageSelectedPrediction = (event) => {
-    console.log("asd");
-    for (let file of event.target.files) {
-      this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: [...prevState.uploadedImagesPrediction, file] }));
-    }
+    this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array() }), () => {
+      for (let file of event.target.files) {
+        this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: [...prevState.uploadedImagesPrediction, file] }));
+      }
+    });
   }
 
   handleModelSelected = (event) => {
     this.setState(prevState => ({ ...prevState, selectedModel: event.target.files[0] }));
   }
 
-  handlePreviewSelectedImage = (image) => {
-    this.setState(prevState => ({images: prevState.images, previewImage: image}));
+  handleSelectedImage = (image) => {
+    this.setState(prevState => ({ ...prevState, predictedImage: image}));
   }
 
   handleAnnotateSelectedImage = (image) => {
@@ -281,10 +314,11 @@ class App extends Component {
     this.setState(prevState => ({ ...prevState, page: 'predict' }));
   }
 
-  intervalFunc = () => {
+  intervalFuncTraining = () => {
+    if (this.state.trainingFinished) return;
     axios({
       method:'GET',
-      url: '/jobs/'+this.state.job_id
+      url: '/jobs/train/'+this.state.job_id
     }).then(response => {
       console.log(response);
       if (response.data.job_status === "finished"){
@@ -297,9 +331,36 @@ class App extends Component {
     });
   }
 
+  intervalFuncPredicting = () => {
+    if (this.state.predictingFinished) return;
+    axios({
+      method:'GET',
+      url:'/jobs/predict/'+this.state.job_id_predict
+    }).then(response => {
+      console.log(response);
+      if (response.data.job_status === "finished"){
+        clearInterval(this.intervalPred);
+        this.intervalPred = null;
+        let result = response.data.result; // [{image: , count: },...]
+        let data = [];
+        result.forEach(r => {
+          data.push({ name: r.image, path: "http://localhost:8888/images/"+r.image, count: r.count });
+        });
+        console.log(data);
+        this.setState(prevState => ({ ...prevState, predictingFinished: true, result: data }));
+      }
+    })
+  }
+
   checkTraining = (job_id) => {
     this.setState(prevState => ({ ...prevState, job_id: job_id }), () => {
-      this.interval = setInterval(this.intervalFunc, 1000);
+      this.interval = setInterval(this.intervalFuncTraining, 1000);
+    });
+  }
+
+  checkPredicting = (job_id) => {
+    this.setState(prevState => ({ ...prevState, job_id_predict: job_id }), () => {
+      this.intervalPred = setInterval(this.intervalFuncPredicting, 1000);
     });
   }
 
@@ -404,7 +465,7 @@ class App extends Component {
   handleCancelTraining = () => {
     axios({
       method:'DELETE',
-      url: '/jobs/'+this.state.job_id
+      url: '/jobs/train/'+this.state.job_id
     }).then(response => {
       clearInterval(this.interval);
       this.interval = null;
@@ -416,6 +477,21 @@ class App extends Component {
     }).catch(err => {
       console.error(err);
     })
+  }
+
+  handleCancelPredicting = () => {
+    axios({
+      method:'DELETE',
+      url:'/jobs/predict/'+this.state.job_id_predict
+    }).then(response => {
+      clearInterval(this.intervalPred);
+      this.intervalPred = null;
+      console.log(response.data);
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictingFinished: false }));
+    }).catch(err => {
+      console.log("errr");
+      console.error(err);
+    });
   }
 
   handleDownloadModel = () => {
@@ -430,6 +506,10 @@ class App extends Component {
   }
 
   handlePredict = () => {
+    if (this.state.alreadyPredicting) return
+
+    this.setState(prevState => ({ ...prevState, alreadyPredicting: true }));
+
     let threshold = this.state.detectionThreshold;
     let uploadedImages = this.state.uploadedImagesPrediction;
     let model = this.state.model;
@@ -454,6 +534,8 @@ class App extends Component {
     }
     this.setState(prevState => ({ ...prevState, predictErrorMessage: ""}));
 
+    this.setState(prevState => ({ ...prevState, alreadyPredicting: true }));
+
     let formData = new FormData();
     uploadedImages.forEach(img => {
       formData.append('images', img);
@@ -473,6 +555,7 @@ class App extends Component {
         data: formData
       }).then(response => {
         console.log(response);
+        this.checkPredicting(response.data.job_id);
       }).catch(err => {
         console.error(err);
       });
@@ -742,10 +825,16 @@ class App extends Component {
           onDeleteDataset={this.handleDeleteDatasetPrediction}
           onEnterLabel={this.handleEnterLabelPrediction}
           onEnterDetectionThreshold={this.handleEnterDetectionThreshold}
+          onCancelPredicting={this.handleCancelPredicting}
           onPredict={this.handlePredict}
+          onSelectedImage={this.handleSelectedImage}
           image_lenght={this.state.uploadedImagesPrediction.length}
           model={this.state.model}
           errorMessage={this.state.predictErrorMessage}
+          alreadyPredicting={this.state.alreadyPredicting}
+          predictingFinished={this.state.predictingFinished}
+          images={this.state.result}
+          predictedImage={this.state.predictedImage}
         >
         </Predict>
       }

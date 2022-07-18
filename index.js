@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 4000;
 const app = express();
 
 let currentlyTraining = false;
+let currentlyPredicting = false;
 let jobId_training = '';
 let jobId_predict = '';
 
@@ -125,6 +126,10 @@ app.post('/images', upload.array('images'), (req, res) => {
   res.send("done");
 });
 
+app.get('/predict', (req, res) => {
+  res.json({ currentlyPredicting: currentlyPredicting, job_id: jobId_predict });
+})
+
 app.post('/predict', predUpload.array('images'), (req, res) => {
   console.log(req.body);
   let threshold = req.body.threshold;
@@ -145,11 +150,14 @@ app.post('/predict', predUpload.array('images'), (req, res) => {
       data: obj
     }).then(response => {
       console.log(response.data);
+      currentlyPredicting = true;
+      jobId_predict = response.data.job_id;
+      return res.json({status: 200, job_id: response.data.job_id });
     }).catch(err => {
       console.error(err);
+      return res.status(500);
     });
   });
-  res.json({status: 200 });
 });
 
 app.delete('/predict/images', (req, res) => {
@@ -323,7 +331,7 @@ app.post('/train', (req, res) => {
   });
 });
 
-app.get('/jobs/:job_id', (req, res) => {
+app.get('/jobs/:type/:job_id', (req, res) => {
   axios({
     method:'GET',
     url:'http://localhost:8888/jobs/'+req.params.job_id
@@ -333,8 +341,14 @@ app.get('/jobs/:job_id', (req, res) => {
     }
     else{
       //getModel();
-      currentlyTraining = false;
-      jobId_training = '';
+      if (req.params.type === 'train') {
+        currentlyTraining = false;
+        jobId_training = '';
+      }
+      else{
+        currentlyPredicting = false;
+        jobId_predict = '';
+      }
       return res.json({job_status: response.data.job_status, result: response.data.result});
     }
   }).catch(err => {
@@ -343,13 +357,19 @@ app.get('/jobs/:job_id', (req, res) => {
   });
 });
 
-app.delete('/jobs/:job_id', (req, res) => {
+app.delete('/jobs/:type/:job_id', (req, res) => {
   axios({
     method:'delete',
     url:'http://localhost:8888/jobs/'+req.params.job_id
   }).then(response => {
-    currentlyTraining = false;
-    jobId_training = '';
+    if (req.params.type === 'train'){
+      currentlyTraining = false;
+      jobId_training = '';
+    }
+    else{
+      currentlyPredicting = false;
+      jobId_predict = '';
+    }
     return res.json({status: response.data.status})
   }).catch(err => {
     console.error(err);
