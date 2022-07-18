@@ -98,6 +98,7 @@ const Predict = (props) => {
                         onPreviewSelectedImage={props.onSelectedImage}
                         >
                     </ImageList>
+                    <a className="btn btn-primary mt-2 ms-5" href="http://localhost:8888/predict/" download="predictions.zip" >Download</a>
                 </Col>
             </Row>
         </Container>
