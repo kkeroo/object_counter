@@ -126,7 +126,7 @@ class App extends Component {
     this.getServerImages().then(response => {
       let images_data = response.data.images;
       if (images_data.length == 0) {
-        this.setState(prevState => ({ ...prevState, images: images_data }));
+        this.setState(prevState => ({ ...prevState, images: images_data, currImage: {image: "", name: ""} }));
       }
       else{
         this.setState(prevState => ({ ...prevState, images: images_data, currImage: { image: images_data[0].path, name: images_data[0].name}}));
