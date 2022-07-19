@@ -530,17 +530,16 @@ class App extends Component {
       return;
     }
     
-    this.setState(prevState => ({ ...prevState, alreadyPredicting: true, predictErrorMessage: "" }));
-
+    
     let formData = new FormData();
     uploadedImages.forEach(img => {
       formData.append('images', img);
     });
-
+    
     formData.append('threshold', threshold);
     formData.append('model', model);
     formData.append('label', label);
-
+    
     axios({
       method:"DELETE",
       url:'/predict/images'
@@ -550,6 +549,7 @@ class App extends Component {
         url:'/predict',
         data: formData
       }).then(response => {
+        this.setState(prevState => ({ ...prevState, alreadyPredicting: true, predictErrorMessage: "" }));
         console.log(response);
         this.checkPredicting(response.data.job_id);
       }).catch(err => {
