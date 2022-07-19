@@ -347,7 +347,7 @@ class App extends Component {
           data.push({ name: r.image, path: "http://localhost:8888/images/"+r.image, count: r.count });
         });
         console.log(data);
-        this.setState(prevState => ({ ...prevState, predictingFinished: true, result: data }));
+        this.setState(prevState => ({ ...prevState, predictingFinished: true, result: data, predictedImage: data[0] }));
       }
     })
   }
