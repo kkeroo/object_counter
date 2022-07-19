@@ -332,7 +332,7 @@ class App extends Component {
   }
 
   intervalFuncPredicting = () => {
-    if (this.state.predictingFinished) return;
+    if (this.state.predictingFinished || !this.state.alreadyPredicting) return;
     axios({
       method:'GET',
       url:'/jobs/predict/'+this.state.job_id_predict
@@ -347,20 +347,20 @@ class App extends Component {
           data.push({ name: r.image, path: "http://localhost:8888/images/"+r.image, count: r.count });
         });
         console.log(data);
-        this.setState(prevState => ({ ...prevState, predictingFinished: true, result: data, predictedImage: data[0] }));
+        this.setState(prevState => ({ ...prevState, alreadyPredicting:false, predictingFinished: true, result: data, predictedImage: data[0] }));
       }
     })
   }
 
   checkTraining = (job_id) => {
     this.setState(prevState => ({ ...prevState, job_id: job_id }), () => {
-      this.interval = setInterval(this.intervalFuncTraining, 1000);
+      this.interval = setInterval(this.intervalFuncTraining, 6000);
     });
   }
 
   checkPredicting = (job_id) => {
     this.setState(prevState => ({ ...prevState, job_id_predict: job_id }), () => {
-      this.intervalPred = setInterval(this.intervalFuncPredicting, 1000);
+      this.intervalPred = setInterval(this.intervalFuncPredicting, 5000);
     });
   }
 

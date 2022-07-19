@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/esm/Container';
 import Row from 'react-bootstrap/Row';
 import ImageList from './ImageList';
+import './Predict.css';
 
 const Predict = (props) => {
     return(
@@ -78,9 +79,9 @@ const Predict = (props) => {
 
             <Row className="" hidden={!props.predictingFinished}>
                 <Col lg="9">
-                    <div className="img-container mt-4 me-5">
+                    <div className="predict-img-container mt-4 me-5">
                         <img
-                        className="slika"
+                        className="predict-img"
                         // crossorigin="anonymous"
                         src={props.predictedImage.path}
                         hidden={props.predictedImage === ""}
