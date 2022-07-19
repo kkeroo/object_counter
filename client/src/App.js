@@ -617,6 +617,44 @@ class App extends Component {
     });
   }
 
+  getImageDims = (src, cb) => {
+    let img = new Image();
+    img.src = src;
+    img.onload = function() { cb(this.width, this.height); }
+  }
+
+  resizeImage =() => {
+    let img_col = document.getElementsByClassName('image-col')[0];
+    let slika = document.getElementsByClassName('slika')[0];
+
+    this.getImageDims(slika.src, (width, height) => {
+      if (width > height){
+        let ratio = height / width;
+        let desired_width = img_col.clientWidth - 30;
+        let desired_height = desired_width * ratio;
+
+        if (desired_height > img_col.clientHeight - 30){
+          desired_height = img_col.clientHeight-30;
+          desired_width = desired_height / ratio;
+        }
+        slika.width = desired_width;
+        slika.height = desired_height;
+      }
+      else{
+        let ratio = width / height;
+        let desired_height = img_col.clientHeight - 30;
+        let desired_width = desired_height * ratio;
+
+        if (desired_width > img_col.clientWidth - 30){
+          desired_width = img_col.clientWidth - 30;
+          desired_height = desired_width / ratio;
+        }
+        slika.width = desired_width;
+        slika.height = desired_height;
+      }
+    });
+  }
+
   showMarkerArea() {
     if (this.imgRef.current !== null) {
       // create a marker.js MarkerArea
@@ -722,13 +760,15 @@ class App extends Component {
           >
           </LoadModel>
           <Row>
-            <Col lg="9">
-              <div className="img-container mt-4 me-5">
-                <img ref={this.imgRef}
+            <Col lg="9" className="image-col">
+              <div className="img-container mt-3 me-4">
+                <img
+                  ref={this.imgRef}
                   className="slika"
-                  crossorigin="anonymous"
+                  crossOrigin="anonymous"
                   src={this.state.currImage.image != "" ? this.state.currImage.image : ""}
                   hidden={this.state.currImage.image == ""}
+                  onLoad={this.resizeImage}
                 />
               </div>
             </Col>
