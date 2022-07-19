@@ -149,6 +149,9 @@ class App extends Component {
     this.getTrainingStatus().then(response => {
       let currentlyTraining = response.data.currentlyTraining;
       let job_id = response.data.job_id
+      if (currentlyTraining) {
+        this.checkTraining(job_id);
+      }
       this.setState(prevState => ({ ...prevState, alreadyTraining: currentlyTraining, job_id: job_id }));
     });
   }
@@ -326,7 +329,7 @@ class App extends Component {
         this.interval = null;
         // console.log(this.interval);
         // console.log("JOB FINISHED");
-        this.setState(prevState => ({ ...prevState, trainingFinished: true, train_loss: response.data.result.train_loss, valid_loss: response.data.result.valid_loss }));
+        this.setState(prevState => ({ ...prevState, trainingFinished: true, train_loss: parseFloat(response.data.result.train_loss).toFixed(4), valid_loss: parseFloat(response.data.result.valid_loss).toFixed(4) }));
       }
     });
   }
