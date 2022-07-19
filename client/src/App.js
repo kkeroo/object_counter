@@ -508,14 +508,11 @@ class App extends Component {
   handlePredict = () => {
     if (this.state.alreadyPredicting) return
 
-    this.setState(prevState => ({ ...prevState, alreadyPredicting: true }));
-
     let threshold = this.state.detectionThreshold;
     let uploadedImages = this.state.uploadedImagesPrediction;
     let model = this.state.model;
     let label = this.state.labelPrediction;
-
-    console.log("asd");
+    
     if (threshold < 0 || threshold > 1 || threshold == null) {
       this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please choose value of detection threshold between 0 and 1."}));
       return;
@@ -532,9 +529,8 @@ class App extends Component {
       this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please enter label of object"}));
       return;
     }
-    this.setState(prevState => ({ ...prevState, predictErrorMessage: ""}));
-
-    this.setState(prevState => ({ ...prevState, alreadyPredicting: true }));
+    
+    this.setState(prevState => ({ ...prevState, alreadyPredicting: true, predictErrorMessage: "" }));
 
     let formData = new FormData();
     uploadedImages.forEach(img => {
