@@ -564,6 +564,10 @@ class App extends Component {
     });
   }
 
+  handleReset = () => {
+    this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array(), alreadyPredicting: false, predictingFinished: false, labelPrediction: "", predictErrorMessage: "", detectionThreshold: null, predictedImage: "", result: new Array() }));
+  }
+
   updateAnnotatedImages = (currentState) => {
     console.log(currentState);
     if (currentState.markers.length == 0) return;
@@ -828,6 +832,7 @@ class App extends Component {
           onCancelPredicting={this.handleCancelPredicting}
           onPredict={this.handlePredict}
           onSelectedImage={this.handleSelectedImage}
+          onReset={this.handleReset}
           image_lenght={this.state.uploadedImagesPrediction.length}
           model={this.state.model}
           errorMessage={this.state.predictErrorMessage}

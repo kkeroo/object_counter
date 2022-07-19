@@ -99,6 +99,7 @@ const Predict = (props) => {
                         >
                     </ImageList>
                     <a className="btn btn-primary mt-2 ms-5" href="http://localhost:8888/predict/" download="predictions.zip" >Download</a>
+                    <a className="btn btn-danger mt-2 ms-2" onClick={() => {props.onReset()}}>Reset</a>
                 </Col>
             </Row>
         </Container>
