@@ -1,8 +1,6 @@
-import slika from './slika.jpg'
 import './App.css';
 import * as markerjs2 from 'markerjs2';
 import React, { Component, useState } from 'react';
-import { saveAs } from 'file-saver';
 import axios from 'axios';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,7 +13,6 @@ import Stack from 'react-bootstrap/Stack';
 import ImageList from './components/ImageList';
 import LoadDataset from './components/LoadDataset';
 import Navigation from './components/Navbar';
-import SaveDataset from './components/SaveDataset';
 import Train from './components/Train';
 import LoadModel from './components/LoadModel';
 import Predict from './components/Predict';
@@ -28,13 +25,9 @@ class App extends Component {
       uploadedImages: new Array(),
       uploadedImagesPrediction: new Array(),
       images: new Array(), // all uploaded images
-      previewImage: "", // current preview image in Load dataset page
       page: "annotate", // current page
       currImage: { image: "", name: "" }, // current image for annotation
       editing: false, // are we annotating?
-      annotatedImages: new Array(), // all data (image + annotations)
-      filename: "", // file name of a annotations file, we want to download
-      filenameErrorMessage: "", // error message (eg. unvalid filename, contains . or space)
       toggleInstantAnottations: false, // boolean, idicates we if want to enable new marker creation after marker is created
       alreadyTraining: false, // boolean, idicates if we already sent data to backend...
       alreadyPredicting: false,
@@ -44,7 +37,6 @@ class App extends Component {
       batchSize: 0, // batch size used for training
       epochs: 0, // number of epochs used during training
       label: "", // label of a object we want to detect (count)
-      trainTestSplit: false, // use a train and test split during training
       trainingFinished: false, // indicates if the current training proccess is finished
       predictingFinished: false,
       train_loss: 0,
@@ -65,7 +57,6 @@ class App extends Component {
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
-    this.filereader = null;
     this.interval = null;
     this.intervalPred = null;
   }
@@ -175,21 +166,6 @@ class App extends Component {
       this.loadTrainingStatus();
       this.loadPredictingStatus();
     }
-    // axios({
-    //   method:"get",
-    //   url:"http://localhost:4200"
-    // }).then(response => {
-    //   console.log(response);
-    // }).catch(err => {
-    //   console.error(err);
-    // })
-  }
-
-  fileNameValidation = (filename) => {
-    if (filename == '') return false;
-    let re = /^[\w-]+$/;
-    if (re.test(filename)) return true;
-    return false;
   }
 
   handleServerUpload = () => {
@@ -300,10 +276,6 @@ class App extends Component {
     this.setState(prevState => ({...prevState, page: "annotate"}));
   }
 
-  handleFileNameEnter = (filename) => {
-    this.setState(prevState => ({ ...prevState, filename: filename }));
-  }
-
   handleTrainPage = () => {
     this.setState(prevState => ({ ...prevState, page:'train' }));
   }
@@ -323,14 +295,13 @@ class App extends Component {
       method:'GET',
       url: '/jobs/train/'+this.state.job_id
     }).then(response => {
-      console.log(response);
       if (response.data.job_status === "finished"){
         clearInterval(this.interval);
         this.interval = null;
-        // console.log(this.interval);
-        // console.log("JOB FINISHED");
         this.setState(prevState => ({ ...prevState, trainingFinished: true, train_loss: parseFloat(response.data.result.train_loss).toFixed(4), valid_loss: parseFloat(response.data.result.valid_loss).toFixed(4) }));
       }
+    }).catch(err => {
+      console.error(err);
     });
   }
 
@@ -340,7 +311,6 @@ class App extends Component {
       method:'GET',
       url:'/jobs/predict/'+this.state.job_id_predict
     }).then(response => {
-      console.log(response);
       if (response.data.job_status === "finished"){
         clearInterval(this.intervalPred);
         this.intervalPred = null;
@@ -349,10 +319,11 @@ class App extends Component {
         result.forEach(r => {
           data.push({ name: r.image, path: "http://localhost:8888/images/"+r.image, count: r.count });
         });
-        console.log(data);
         this.setState(prevState => ({ ...prevState, alreadyPredicting:false, predictingFinished: true, result: data, predictedImage: data[0] }));
       }
-    })
+    }).catch(err => {
+      console.error(err);
+    });
   }
 
   checkTraining = (job_id) => {
@@ -384,56 +355,10 @@ class App extends Component {
       url:'/train',
       data: data
     }).then(response => {
-      console.log(response.data);
       this.checkTraining(response.data.job_id);
     }).catch(err => {
       console.error(err);
     });
-    // let data = this.state.annotatedImages;
-    // let images = new Array();
-    // let anno = new Array();
-
-    // for (let i = 0; i < data.length; i++){
-    //   images.push(data[i].image.file);
-    //   let ann = {width: data[i].state.width, height: data[i].state.height};
-    //   let ms = new Array();
-    //   for (let j = 0; j < data[i].state.markers.length; j++){
-    //     let m = {left: data[i].state.markers[j].left, top: data[i].state.markers[j].top, width: data[i].state.markers[j].width, height: data[i].state.markers[j].height};
-    //     ms.push(m);
-    //   }
-    //   ann.markers = ms;
-    //   anno.push(ann);
-    // }
-
-    // let formData = new FormData();
-    // images.forEach(img => {
-    //   formData.append('images', img);
-      
-    // });
-
-    // axios({
-    //   method:'POST',
-    //   url: "http://localhost:8000",
-    //   data: formData
-    // }).then(response => {
-    //   let user_hash = response.data.hash;
-    //   let data = {annotations: anno, user_hash: user_hash};
-    //   console.log(data);
-    //   axios({
-    //     method:'POST',
-    //     url: "http://localhost:8000/anno",
-    //     data: data
-    //   }).then(response => {
-    //     console.log(response);
-    //     // check if training is finished
-    //     this.checkTraining(response.data.job_id);
-    //   }).catch(error => {
-    //     console.error(error);
-    //   });
-    // }).catch(error => {
-    //   console.error(error);
-    // });
-
   }
 
   handleEnterModelName = (e) => {
@@ -461,10 +386,6 @@ class App extends Component {
     this.setState(prevState => ({ ...prevState, detectionThreshold: e.target.value }));
   }
 
-  handleTrainTestSplit = () => {
-    this.setState(prevState => ({ ...prevState, trainTestSplit: !this.state.trainTestSplit }));
-  }
-
   handleCancelTraining = () => {
     axios({
       method:'DELETE',
@@ -472,7 +393,7 @@ class App extends Component {
     }).then(response => {
       clearInterval(this.interval);
       this.interval = null;
-      this.setState(prevState => ({ ...prevState, alreadyTraining: false, modelName: "", batchSize: 0, epochs: 0, label: "", trainTestSplit: false, trainingFinished: false, jobCancelStatus: response.data.status }));
+      this.setState(prevState => ({ ...prevState, alreadyTraining: false, modelName: "", batchSize: 0, epochs: 0, label: "", trainingFinished: false, jobCancelStatus: response.data.status }));
       const timer = setTimeout(() => {
         this.setState(prevState => ({ ...prevState, jobCancelStatus: "" }));
         clearTimeout(timer);
@@ -489,10 +410,8 @@ class App extends Component {
     }).then(response => {
       clearInterval(this.intervalPred);
       this.intervalPred = null;
-      console.log(response.data);
       this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictingFinished: false }));
     }).catch(err => {
-      console.log("errr");
       console.error(err);
     });
   }
@@ -553,7 +472,6 @@ class App extends Component {
         data: formData
       }).then(response => {
         this.setState(prevState => ({ ...prevState, alreadyPredicting: true, predictErrorMessage: "" }));
-        console.log(response);
         this.checkPredicting(response.data.job_id);
       }).catch(err => {
         console.error(err);
@@ -568,22 +486,9 @@ class App extends Component {
   }
 
   updateAnnotatedImages = (currentState) => {
-    console.log(currentState);
     if (currentState.markers.length == 0) return;
-    // const newAnnotatedImages = this.state.annotatedImages;
+
     const currImage = this.state.currImage;
-
-    // for (let i = 0; i < newAnnotatedImages.length; i++){
-    //   if (newAnnotatedImages[i].image.name === currImage.name){
-    //     newAnnotatedImages[i].state = currentState;
-    //     this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
-    //     return;
-    //   }
-    // }
-
-    // image is not yet in annotatedImages...
-    // newAnnotatedImages.push({image: currImage, state: currentState});
-    // this.setState(prevState => ({ ...prevState, annotatedImages: newAnnotatedImages }));
 
     let data = {state: currentState, image: currImage.name};
 
@@ -681,12 +586,6 @@ class App extends Component {
           this.markerArea.restoreState(state);
           this.setState(prevState => ({ ...prevState, totalMarkers: state.markers.length }));
         });
-        // for (let i = 0; i < this.state.annotatedImages.length; i++){
-        //   if (this.state.currImage.name === this.state.annotatedImages[i].image.name){
-        //     console.log("že obstaja state");
-        //     this.markerArea.restoreState(this.state.annotatedImages[i].state);
-        //   }
-        // }
       });
 
       this.markerArea.addEventListener('markercreate', event => {
@@ -695,19 +594,9 @@ class App extends Component {
         }
       });
 
-      // this.markerArea.removeEventListener('markercreate');
-
       // launch marker.js
       this.setState(prevState => ({...prevState, editing: true}));
       this.markerArea.show();
-    }
-  }
-
-  zoom(e) {
-    let deltaY = e.deltaY;
-    console.log(deltaY);
-    if (deltaY > 1){
-      this.markerArea.stepZoom();
     }
   }
 
@@ -820,16 +709,6 @@ class App extends Component {
           return (
           <>
             {this.mainPage()}
-            {/* <LoadDataset
-              onImageSelected={this.handleImageSelected}
-              onDeleteDataset={this.handleDeleteDataset}
-              onServerUpload={this.handleServerUpload}
-              images={this.state.images}
-              uploadedImages={this.state.uploadedImages}
-              uploadingImages={this.state.uploadingImages}
-              onClose={this.handleAnnotatePage}
-              show={this.state.page === "load_dataset"}>
-            </LoadDataset>  */}
           </>
           );
         }
@@ -896,9 +775,6 @@ class App extends Component {
           onTrainModel={this.handleTrainPage}
           onLoadModel={this.handleLoadModelPage}
           onPredict={this.handleLoadPredictPage}
-          disableSaveDataset={this.state.annotatedImages.length == 0}
-          disableAnnotate={this.state.images.length == 0}
-          disableTrainModel={this.state.annotatedImages.length == 0}
         >
         </Navigation>
         {this.pageDisplay()}
