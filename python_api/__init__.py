@@ -1,4 +1,5 @@
 from urllib.error import HTTPError
+
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.options import define, options
@@ -6,6 +7,8 @@ from tornado.web import Application
 import tornado.web
 import tornado.gen
 from tornado.escape import json_decode
+from tornado.log import enable_pretty_logging
+
 import requests
 import cv2
 import numpy as np
@@ -53,7 +56,6 @@ class imagesHandler(tornado.web.RequestHandler):
 
     @tornado.gen.coroutine
     def get(self, param):
-        print(param)
         img = Image.open('./predictions/'+param)
         self.set_header('Content-Type', 'image/png')
         img = open('./predictions/'+param, 'rb')
@@ -67,19 +69,9 @@ class imagesHandler(tornado.web.RequestHandler):
         self.set_status(204)
         self.finish()
 
-@tornado.gen.coroutine
-def get_result(job):
-    while True:
-        yield tornado.gen.sleep(0.1)
-        if job.result is not None or job.get_status() == 'failed':
-            break
-    raise tornado.gen.Return(job)
-
-
 class jobsHandler(tornado.web.RequestHandler):
     @tornado.gen.coroutine
     def get(self, job_id):
-        print(f"GET: Job id: {job_id}")
         try:
             job = Job.fetch(job_id, connection=Redis())
             if job.get_status() != "finished":
@@ -92,7 +84,6 @@ class jobsHandler(tornado.web.RequestHandler):
 
     @tornado.gen.coroutine
     def delete(self, job_id):
-        print(f"DELETE: Job id: {job_id}")
         try:
             send_stop_job_command(Redis(), job_id)
             job = Job.fetch(job_id, connection=Redis())
@@ -144,15 +135,11 @@ class modelHandler(tornado.web.RequestHandler):
             image_name = ann['image_name']
             images.append(getImage(image_name))
 
-        print(len(annotations))
-        print(len(images))
-        print(modelName, epochs, batchSize, label)
+        print(f'Ann. lenght: {len(annotations)}, Imgs. lenght: {len(images)}, model name: {modelName} \n \
+            Epochs: {epochs}, Batch size: {batchSize}, Label: {label}')
 
-        # result = train_model(images, annotations, 1, 1, label)
         job = q.enqueue(train_model, job_timeout='24h', args=(images, annotations, epochs, batchSize, label))
-        # job = q.enqueue(print_task, 10)
         self.write({'message': 'success', 'job_id': job.id})
-        # job = yield get_result(job)
     
     def options(self, *args):
         # no body
@@ -217,6 +204,7 @@ class predictHandler(tornado.web.RequestHandler):
 define('port', default=8888, help='port to listen on')
 
 def main():
+    enable_pretty_logging()
     """Construct and serve the tornado application."""
     app = Application([
         (r"/", modelHandler),
