@@ -775,6 +775,7 @@ class App extends Component {
           onTrainModel={this.handleTrainPage}
           onLoadModel={this.handleLoadModelPage}
           onPredict={this.handleLoadPredictPage}
+          page={this.state.page}
         >
         </Navigation>
         {this.pageDisplay()}
