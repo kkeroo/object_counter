@@ -104,7 +104,16 @@ dist
 .tern-port
 
 # Python API
-python_api
+python_api/__pycache__
+python_api/predictions
+python_api/venv
+python_api/best_model.pt
+python_api/dmodel.pt
+python_api/model.pt
+python_api/people_best_model.pt
+python_api/config.py
+python_api/main.py
+python_api/predictions.zip
 
 uploaded_annotations
 uploaded_images
