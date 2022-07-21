@@ -51,6 +51,9 @@ def getModel(model_name):
     open('dmodel.pt', 'wb').write(response.content)
     return
 
+def createDirectory(dirname):
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
 
 class imagesHandler(tornado.web.RequestHandler):
 
@@ -204,6 +207,9 @@ class predictHandler(tornado.web.RequestHandler):
 define('port', default=8888, help='port to listen on')
 
 def main():
+    """Create needed directories"""
+    createDirectory('./predictions')
+    """Enable Tornado logging"""
     enable_pretty_logging()
     """Construct and serve the tornado application."""
     app = Application([

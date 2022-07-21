@@ -111,7 +111,6 @@ python_api/best_model.pt
 python_api/dmodel.pt
 python_api/model.pt
 python_api/people_best_model.pt
-python_api/config.py
 python_api/main.py
 python_api/predictions.zip
 
