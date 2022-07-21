@@ -36,6 +36,19 @@ app.use(cors());
 //   });
 // }
 
+const createDirectory = (dirname) => {
+  if (!fs.existsSync(dirname)){
+    fs.mkdirSync(dirname);
+  }
+}
+
+// create directiories if needed (usefull for fresh start)
+createDirectory('./uploaded_annotations');
+createDirectory('./uploaded_images');
+createDirectory('./uploaded_images/training');
+createDirectory('./uploaded_images/prediction');
+createDirectory('./uploaded_models');
+
 app.use(express.static(path.join(__dirname, 'client', 'build')));
 
 app.use("/", (req, res, next) => {
