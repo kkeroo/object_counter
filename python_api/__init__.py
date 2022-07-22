@@ -13,7 +13,7 @@ import requests
 import cv2
 import numpy as np
 from PIL import Image
-from workers import train_model, print_task, predict
+from workers import train_model, print_task, predict, predict_faster_rcnn
 import os
 import shutil
 
@@ -173,9 +173,9 @@ class predictHandler(tornado.web.RequestHandler):
     @tornado.gen.coroutine
     def post(self):
         data = json_decode(self.request.body)
+        method = data['method']
         detection_threshold = float(data['threshold'])
         label = data['label']
-        model = data['model']
         images = data['images']
 
         global pred_images
@@ -183,8 +183,6 @@ class predictHandler(tornado.web.RequestHandler):
 
         for img in images:
             pred_images.append({'image': getPredImage(img), 'name': img})
-
-        getModel(model)
 
         folder = './predictions'
         for filename in os.listdir(folder):
@@ -195,8 +193,14 @@ class predictHandler(tornado.web.RequestHandler):
             except Exception as e:
                 print('Failed to delete %s. Reason: %s' % (filepath, e))
 
-        job = q.enqueue(predict, job_timeout='24h', args=('dmodel.pt', pred_images, detection_threshold, label))
-        self.write({'message': 'success', 'job_id': job.id})
+        if method == 'custom':
+            model = data['model']
+            getModel(model)
+            job = q.enqueue(predict, job_timeout='24h', args=('dmodel.pt', pred_images, detection_threshold, label))
+            self.write({'message': 'success', 'job_id': job.id})
+        elif method == 'faster_rcnn':
+            job = q.enqueue(predict_faster_rcnn, job_timeout='24h', args=(pred_images, detection_threshold, label))
+            self.write({'message': 'success', 'job_id': job.id})
 
     def options(self, *args):
         # no body

@@ -53,12 +53,27 @@ class App extends Component {
       uploadingModel: false,
       totalMarkers: 0,
       predictedImage: "",
-      result: new Array()
+      result: new Array(),
+      inferenceMethod: ""
     };
     this.imgRef = React.createRef();
     this.markerArea = null;
     this.interval = null;
     this.intervalPred = null;
+    this.coco_names = [
+      'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
+      'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign',
+      'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
+      'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella',
+      'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
+      'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
+      'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl',
+      'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
+      'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table',
+      'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
+      'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book',
+      'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
+  ]
   }
 
   getServerImages = () => {
@@ -430,11 +445,17 @@ class App extends Component {
   handlePredict = () => {
     if (this.state.alreadyPredicting) return
 
+    let method = this.state.inferenceMethod;
     let threshold = this.state.detectionThreshold;
     let uploadedImages = this.state.uploadedImagesPrediction;
     let model = this.state.model;
     let label = this.state.labelPrediction;
     
+    if (method === ""){
+      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please first choose the method."}));
+      return;
+    }
+
     if (threshold < 0 || threshold > 1 || threshold == null) {
       this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please choose value of detection threshold between 0 and 1."}));
       return;
@@ -458,8 +479,11 @@ class App extends Component {
       formData.append('images', img);
     });
     
+    formData.append('method', method);
+    if (method === "custom"){
+      formData.append('model', model);
+    }
     formData.append('threshold', threshold);
-    formData.append('model', model);
     formData.append('label', label);
     
     axios({
@@ -482,7 +506,11 @@ class App extends Component {
   }
 
   handleReset = () => {
-    this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array(), alreadyPredicting: false, predictingFinished: false, labelPrediction: "", predictErrorMessage: "", detectionThreshold: null, predictedImage: "", result: new Array() }));
+    this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array(), alreadyPredicting: false, predictingFinished: false, labelPrediction: "", predictErrorMessage: "", detectionThreshold: null, predictedImage: "", result: new Array(), method: "" }));
+  }
+
+  handleSelectMethod = (e) => {
+    this.setState(prevState => ({ ...prevState, inferenceMethod: e.target.value }));
   }
 
   updateAnnotatedImages = (currentState) => {
@@ -751,6 +779,7 @@ class App extends Component {
           onPredict={this.handlePredict}
           onSelectedImage={this.handleSelectedImage}
           onReset={this.handleReset}
+          onSelectMethod={this.handleSelectMethod}
           image_lenght={this.state.uploadedImagesPrediction.length}
           model={this.state.model}
           errorMessage={this.state.predictErrorMessage}
@@ -758,6 +787,8 @@ class App extends Component {
           predictingFinished={this.state.predictingFinished}
           images={this.state.result}
           predictedImage={this.state.predictedImage}
+          method={this.state.inferenceMethod}
+          categories={this.coco_names}
         >
         </Predict>
       }

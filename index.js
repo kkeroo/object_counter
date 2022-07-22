@@ -145,16 +145,20 @@ app.get('/predict', (req, res) => {
 
 app.post('/predict', predUpload.array('images'), (req, res) => {
   console.log(req.body);
+  let method = req.body.method;
   let threshold = req.body.threshold;
   let label = req.body.label;
-  let model = req.body.model;
 
   let obj = {
+    method: method,
     threshold: threshold,
-    label: label,
-    model: model
+    label: label
   };
 
+  if (method === "custom"){
+    obj.model = req.body.model;
+  }
+  
   fs.readdir('./uploaded_images/prediction/', (err, files) => {
     obj.images = files
     axios({

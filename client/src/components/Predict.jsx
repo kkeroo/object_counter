@@ -13,16 +13,31 @@ const Predict = (props) => {
             <Row className="mt-5" hidden={props.predictingFinished}>
                 <Col></Col>
                 <Col>
-                    <Form.Label>Images for prediction</Form.Label>
+                    <Form.Label>Inference method</Form.Label>
+                    <select className="form-select" onChange={(e) => {props.onSelectMethod(e)}}>
+                        <option selected value="">Choose a method</option>
+                        <option value="custom">Custom model</option>
+                        <option value="faster_rcnn">Faster R-CNN model</option>
+                        <option value="density">Density method</option>
+                    </select>
+                    <Form.Label className="mt-2">Images for prediction</Form.Label>
                     <Form.Control required type="file" disabled={props.alreadyPredicting} multiple accept="image/jpg, image/png" onChange={e => { props.onImageSelected(e) }}/>
 
-                    <Form.Label className="mt-2">Label</Form.Label>
-                    <Form.Control type="text" disabled={props.alreadyPredicting} onChange={e => {props.onEnterLabel(e)}} placeholder="Enter the name of objects"/>
+                    <Form.Label className="mt-2" hidden={props.method !== 'custom'}>Label</Form.Label>
+                    <Form.Control type="text" disabled={props.alreadyPredicting} hidden={props.method !== 'custom'} onChange={e => {props.onEnterLabel(e)}} placeholder="Enter the name of objects"/>
                     
+                    <Form.Label hidden={props.method !== 'faster_rcnn'} className="mt-2">Category</Form.Label>
+                    <select hidden={props.method !== 'faster_rcnn'} className="form-select" onChange={(e) => {props.onEnterLabel(e)}}>
+                        <option value="" selected>Select category</option>
+                        {props.categories.map(category => (
+                            <option value={category}>{category}</option>
+                        ))}
+                    </select>
+
                     <Form.Label className="mt-2">Detection threshold</Form.Label>
                     <Form.Control type="number" disabled={props.alreadyPredicting} min="0" max="1" onChange={e => {props.onEnterDetectionThreshold(e)}} placeholder="Enter the detection threshold"/>
 
-                    <div className="mt-2">
+                    <div className="mt-2" hidden={props.method !== 'custom'}>
                         <p hidden={props.model == null}>Selected model: <strong>{props.model}</strong></p>
                         <p hidden={props.model != null}>Please first upload a model</p>
                     </div>
