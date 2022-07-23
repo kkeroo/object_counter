@@ -14,7 +14,7 @@ const Predict = (props) => {
                 <Col></Col>
                 <Col>
                     <Form.Label>Inference method</Form.Label>
-                    <select className="form-select" onChange={(e) => {props.onSelectMethod(e)}}>
+                    <select className="form-select" disabled={props.alreadyPredicting} onChange={(e) => {props.onSelectMethod(e)}}>
                         <option selected value="">Choose a method</option>
                         <option value="custom">Custom model</option>
                         <option value="faster_rcnn">Faster R-CNN model</option>
