@@ -18,14 +18,22 @@ const Predict = (props) => {
                         <option selected value="">Choose a method</option>
                         <option value="custom">Custom model</option>
                         <option value="faster_rcnn">Faster R-CNN model</option>
-                        <option value="density">Density method</option>
+                        <option value="famnet">FamNet model</option>
                     </select>
-                    <Form.Label className="mt-2">Images for prediction</Form.Label>
-                    <Form.Control required type="file" disabled={props.alreadyPredicting} multiple accept="image/jpg, image/png" onChange={e => { props.onImageSelected(e) }}/>
 
+                    <Form.Label className="mt-2">Images for prediction</Form.Label>
+                    
+                    {/* Used with every method but FamNet */}
+                    <Form.Control required type="file" hidden={props.method == 'famnet'} disabled={props.alreadyPredicting} multiple accept="image/jpg, image/png" onChange={e => { props.onImageSelected(e) }}/>
+
+                    {/* Used only with FamNet */}
+                    <Form.Text hidden={props.method != 'famnet'}><br></br>For FamNet method images with annotations are used.<br></br></Form.Text>
+
+                    {/* Used only for custom method */}
                     <Form.Label className="mt-2" hidden={props.method !== 'custom'}>Label</Form.Label>
                     <Form.Control type="text" disabled={props.alreadyPredicting} hidden={props.method !== 'custom'} onChange={e => {props.onEnterLabel(e)}} placeholder="Enter the name of objects"/>
                     
+                    {/* Used only for Faster R-CNN method */}
                     <Form.Label hidden={props.method !== 'faster_rcnn'} className="mt-2">Category</Form.Label>
                     <select hidden={props.method !== 'faster_rcnn'} className="form-select" onChange={(e) => {props.onEnterLabel(e)}}>
                         <option value="" selected>Select category</option>
@@ -34,9 +42,11 @@ const Predict = (props) => {
                         ))}
                     </select>
 
-                    <Form.Label className="mt-2">Detection threshold</Form.Label>
-                    <Form.Control type="number" disabled={props.alreadyPredicting} min="0" max="1" onChange={e => {props.onEnterDetectionThreshold(e)}} placeholder="Enter the detection threshold"/>
+                    {/* Used with every method but FamNet method */}
+                    <Form.Label hidden={props.method === "famnet"} className="mt-2">Detection threshold</Form.Label>
+                    <Form.Control type="number" hidden={props.method === "famnet"} disabled={props.alreadyPredicting} min="0" max="1" onChange={e => {props.onEnterDetectionThreshold(e)}} placeholder="Enter the detection threshold"/>
 
+                    {/* Used only with custom method */}
                     <div className="mt-2" hidden={props.method !== 'custom'}>
                         <p hidden={props.model == null}>Selected model: <strong>{props.model}</strong></p>
                         <p hidden={props.model != null}>Please first upload a model</p>

@@ -455,54 +455,84 @@ class App extends Component {
       this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please first choose the method."}));
       return;
     }
-
-    if (threshold < 0 || threshold > 1 || threshold == null) {
-      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please choose value of detection threshold between 0 and 1."}));
+    if (method === "famnet" && this.state.images.length == 0){
+      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please upload images and annotate them."}));
       return;
     }
-    if (uploadedImages.length == 0){
+    if (uploadedImages.length == 0 && method !== "famnet"){
       this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please upload images."}));
       return;
     }
-    if (model == null){
+
+    if ((threshold < 0 || threshold > 1 || threshold == null) && method !== "famnet") {
+      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please choose value of detection threshold between 0 and 1."}));
+      return;
+    }
+    if (model == null && method === "custom"){
       this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please upload model."}));
       return;
     }
-    if (label == ""){
+    if (label == "" && method !== "famnet"){
       this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please enter label of object"}));
       return;
     }
     
     
     let formData = new FormData();
-    uploadedImages.forEach(img => {
-      formData.append('images', img);
-    });
+    if (method !== "famnet"){
+      uploadedImages.forEach(img => {
+        formData.append('images', img);
+      });
+    }
     
     formData.append('method', method);
     if (method === "custom"){
       formData.append('model', model);
     }
-    formData.append('threshold', threshold);
-    formData.append('label', label);
-    
-    axios({
-      method:"DELETE",
-      url:'/predict/images'
-    }).then(response => {
+
+    if (method !== "famnet"){
+      formData.append('threshold', threshold);
+      formData.append('label', label);
+    }
+
+    if (method === "famnet"){
       axios({
-        method:'POST',
-        url:'/predict',
-        data: formData
+        method:"DELETE",
+        url:'/predict/images'
       }).then(response => {
-        this.setState(prevState => ({ ...prevState, alreadyPredicting: true, predictErrorMessage: "" }));
-        this.checkPredicting(response.data.job_id);
+        axios({
+          method:'POST',
+          url:'/predict/famnet',
+          data: formData
+        }).then(response => {
+          this.setState(prevState => ({ ...prevState, alreadyPredicting: true, predictErrorMessage: "" }));
+          this.checkPredicting(response.data.job_id);
+        }).catch(err => {
+          console.error(err);
+        });
       }).catch(err => {
         console.error(err);
       });
-    }).catch(err => {
-      console.error(err);
-    });
+    }
+    else{
+      axios({
+        method:"DELETE",
+        url:'/predict/images'
+      }).then(response => {
+        axios({
+          method:'POST',
+          url:'/predict',
+          data: formData
+        }).then(response => {
+          this.setState(prevState => ({ ...prevState, alreadyPredicting: true, predictErrorMessage: "" }));
+          this.checkPredicting(response.data.job_id);
+        }).catch(err => {
+          console.error(err);
+        });
+      }).catch(err => {
+        console.error(err);
+      });
+    }
   }
 
   handleReset = () => {
