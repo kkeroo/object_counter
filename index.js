@@ -141,7 +141,7 @@ app.post('/images', upload.array('images'), (req, res) => {
 
 app.get('/predict', (req, res) => {
   res.json({ currentlyPredicting: currentlyPredicting, job_id: jobId_predict });
-})
+});
 
 app.post('/predict', predUpload.array('images'), (req, res) => {
   console.log(req.body);
@@ -158,7 +158,7 @@ app.post('/predict', predUpload.array('images'), (req, res) => {
   if (method === "custom"){
     obj.model = req.body.model;
   }
-  
+
   fs.readdir('./uploaded_images/prediction/', (err, files) => {
     obj.images = files
     axios({
@@ -173,6 +173,59 @@ app.post('/predict', predUpload.array('images'), (req, res) => {
     }).catch(err => {
       console.error(err);
       return res.status(500);
+    });
+  });
+});
+
+app.post('/predict/famnet', (req, res) => {
+  // with FamNet method we use training images and annotations saved on server
+  
+  let annotations = new Array();
+  
+  // read all annotations files into annotations array
+  // save annotation file's name and content
+  let annotations_list = fs.readdirSync('./uploaded_annotations');
+  annotations_list = annotations_list.map(f => './uploaded_annotations/' + f);
+  annotations_list.forEach(ann => {
+    let file = fs.readFileSync(ann);
+    file = JSON.parse(file);
+    let name = path.parse(ann).name;
+    annotations.push({ name: name, file: file });
+  });
+
+  data = new Array();
+  // read all images and keep only those which have their annotations file
+  fs.readdir('./uploaded_images/training/', (err, files) => {
+    let file_paths = files.map(f => './uploaded_images/training/' + f);
+    
+    file_paths.forEach(file_path => {
+      annotations.forEach(ann => {
+        let image_name = path.parse(file_path).name;
+        if (ann.name === image_name){
+          // we have a match
+          let obj = { image_name: path.parse(file_path).base, width: ann.file.width, height: ann.file.height, markers: new Array() }
+          ann.file.markers.forEach(marker => {
+            obj.markers.push({left: marker.left, top: marker.top, width: marker.width, height: marker.height});
+          });
+          data.push(obj);
+        }
+      });
+    });
+
+    let a = {data: data, method: 'famnet'};
+
+    axios({
+        method:'POST',
+        url: "http://localhost:8888/predict/",
+        data: a
+      }).then(response => {
+          console.log(response.data);
+          currentlyPredicting = true;
+          jobId_predict = response.data.job_id;
+          return res.json({ status: "success", job_id: response.data.job_id });
+        }).catch(err => {
+            console.error(err);
+            return res.json({ status: "error" });
     });
   });
 });
