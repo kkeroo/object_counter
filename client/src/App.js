@@ -332,7 +332,7 @@ class App extends Component {
         let result = response.data.result; // [{image: , count: },...]
         let data = [];
         result.forEach(r => {
-          data.push({ name: r.image, path: "http://localhost:8888/images/"+r.image, count: r.count });
+          data.push({ name: r.image, path: "http://localhost:8888/images/"+r.image, count: parseFloat(r.count).toFixed(4) });
         });
         this.setState(prevState => ({ ...prevState, alreadyPredicting:false, predictingFinished: true, result: data, predictedImage: data[0] }));
       }
@@ -536,7 +536,7 @@ class App extends Component {
   }
 
   handleReset = () => {
-    this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array(), alreadyPredicting: false, predictingFinished: false, labelPrediction: "", predictErrorMessage: "", detectionThreshold: null, predictedImage: "", result: new Array(), method: "" }));
+    this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array(), alreadyPredicting: false, predictingFinished: false, labelPrediction: "", predictErrorMessage: "", detectionThreshold: null, predictedImage: "", result: new Array(), inferenceMethod: "" }));
   }
 
   handleSelectMethod = (e) => {
