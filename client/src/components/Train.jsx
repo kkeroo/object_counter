@@ -12,9 +12,9 @@ const Train = (props) => {
             <Row className="mt-5" hidden={props.trainingFinished}>
                 <Col></Col>
                 <Col>
-                    <Form.Label>Model name</Form.Label>
-                    <Form.Control disabled={props.alreadyTraining} onChange={e => { props.onEnterModelName(e)}} type="text" placeholder="Enter model name"/>
-
+                    <div class="alert alert-info" role="alert">
+                        You need at least two annotated images.
+                    </div>
                     <Form.Label className="mt-2">Batch size</Form.Label>
                     <Form.Control disabled={props.alreadyTraining} onChange={e => { props.onEnterBatchSize(e)}} type="number" placeholder="Enter batch size"/>
 
@@ -52,6 +52,9 @@ const Train = (props) => {
                 <Col>
                 <div class="alert alert-danger" role="alert" hidden={props.jobCancelStatus !== "error"}>
                     {props.jobCancelStatus === "error" ? "There was an error while canceling training." : ""}
+                </div>
+                <div class="alert alert-danger" role="alert" hidden={props.errorMessage === ''}>
+                    {props.errorMessage}
                 </div>
                 <div class="alert alert-warning" role="alert" hidden={props.jobCancelStatus !== "success"}>
                     {props.jobCancelStatus === "success" ? "Training was successfully canceled." : ""}

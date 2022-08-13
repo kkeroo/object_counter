@@ -41,6 +41,7 @@ class App extends Component {
       predictingFinished: false,
       train_loss: 0,
       valid_loss: 0,
+      trainErrorMessage: '',
       jobCancelStatus: "", // status of a canceled job: success or error
       uploadingImages: false,
       openDatasetModal: false,
@@ -355,6 +356,22 @@ class App extends Component {
 
   handleTrainModel = () => {
     if (this.state.alreadyTraining) return;
+
+    else if (this.state.batchSize == 0){
+      this.setState(prevState => ({ ...prevState, trainErrorMessage: "Please enter batch size."}));
+      return;
+    }
+    else if (this.state.epochs == 0){
+      this.setState(prevState => ({ ...prevState, trainErrorMessage: "Please enter number of epochs."}));
+      return;
+    }
+    else if (this.state.label === ''){
+      this.setState(prevState => ({ ...prevState, trainErrorMessage: "Please enter label."}));
+      return;
+    }
+    else{
+      this.setState(prevState => ({ ...prevState, trainErrorMessage: ""}));
+    }
 
     this.setState(prevState => ({ ...prevState, alreadyTraining: true }));
 
@@ -792,6 +809,7 @@ class App extends Component {
         alreadyTraining={this.state.alreadyTraining}
         trainingFinished={this.state.trainingFinished}
         jobCancelStatus={this.state.jobCancelStatus}
+        errorMessage={this.state.trainErrorMessage}
         valid_loss={this.state.valid_loss}
         train_loss={this.state.train_loss}
         ></Train>
