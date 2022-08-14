@@ -333,7 +333,7 @@ class App extends Component {
         let result = response.data.result; // [{image: , count: },...]
         let data = [];
         result.forEach(r => {
-          data.push({ name: r.image, path: "http://localhost:8888/images/"+r.image, count: parseFloat(r.count).toFixed(4) });
+          data.push({ name: r.image, path: "http://localhost:8888/images/"+r.image, count: this.state.method === 'famnet' ? parseFloat(r.count).toFixed(4) : r.count });
         });
         this.setState(prevState => ({ ...prevState, alreadyPredicting:false, predictingFinished: true, result: data, predictedImage: data[0] }));
       }
