@@ -18,6 +18,7 @@
 #### React
 - move to client directory
 - run ```npm install```
+- run ```npm run build```
 
 ### Running application
 #### With NodeJS serving frontend
