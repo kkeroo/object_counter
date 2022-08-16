@@ -244,9 +244,11 @@ class App extends Component {
   }
 
   handleImageSelected = (event) => {
-    for (let file of event.target.files) {
-        this.setState(prevState => ({ ...prevState, uploadedImages: [...prevState.uploadedImages, file] }));
-    }
+    this.setState(prevState => ({ ...prevState, uploadedImages: new Array() }), () => {
+      for (let file of event.target.files) {
+          this.setState(prevState => ({ ...prevState, uploadedImages: [...prevState.uploadedImages, file] }));
+      }
+    });
   };
 
   handleImageSelectedPrediction = (event) => {

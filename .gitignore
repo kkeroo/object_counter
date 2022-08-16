@@ -113,6 +113,8 @@ python_api/model.pt
 python_api/people_best_model.pt
 python_api/main.py
 python_api/predictions.zip
+python_api/save.png
+python_api/save.pdf
 
 uploaded_annotations
 uploaded_images
