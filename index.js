@@ -13,6 +13,8 @@ const FormData = require('form-data');
 const PORT = process.env.PORT || 4000;
 const app = express();
 
+const baseUrl = 'http://localhost:4000';
+
 let currentlyTraining = false;
 let currentlyPredicting = false;
 let jobId_training = '';
@@ -129,7 +131,7 @@ app.get('/images', (req, res) => {
   image_names = fs.readdirSync('./uploaded_images/training/');
   image_paths = new Array();
   image_names.forEach(file => {
-    image_paths.push({name:file, path:'http://localhost:4000/images/'+file});
+    image_paths.push({name:file, path:baseUrl + '/images/'+file});
   });
 
   res.json({ images: image_paths });

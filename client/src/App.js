@@ -17,6 +17,9 @@ import Train from './components/Train';
 import LoadModel from './components/LoadModel';
 import Predict from './components/Predict';
 
+let baseUrl = 'http://localhost';
+// let baseUrl = 'http://192.168.178.41';
+
 class App extends Component {
   constructor(props){
     super(props);
@@ -81,7 +84,7 @@ class App extends Component {
     return new Promise ((resolve, reject) => {
       axios({
         method:'GET',
-        url:'http://localhost:4000/images'
+        url: baseUrl + ':4000/images'
       }).then(response => {
         resolve(response);
       }).catch(err => {
@@ -335,7 +338,7 @@ class App extends Component {
         let result = response.data.result; // [{image: , count: },...]
         let data = [];
         result.forEach(r => {
-          data.push({ name: r.image, path: "http://localhost:8888/images/"+r.image, count: this.state.method === 'famnet' ? parseFloat(r.count).toFixed(4) : r.count });
+          data.push({ name: r.image, path: baseUrl + ":8888/images/"+r.image, count: this.state.method === 'famnet' ? parseFloat(r.count).toFixed(4) : r.count });
         });
         this.setState(prevState => ({ ...prevState, alreadyPredicting:false, predictingFinished: true, result: data, predictedImage: data[0] }));
       }
