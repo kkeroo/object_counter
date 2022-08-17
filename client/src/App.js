@@ -51,6 +51,7 @@ class App extends Component {
       labelPrediction: "",
       predictErrorMessage: "",
       detectionThreshold: null,
+      kernelSizeFactor: 0.7,
       openModelModal: false,
       selectedModel: null,
       model: null,
@@ -423,6 +424,10 @@ class App extends Component {
     this.setState(prevState => ({ ...prevState, detectionThreshold: e.target.value }));
   }
 
+  handleEnterSizeFactor = (e) => {
+    this.setState(prevState => ({ ...prevState, kernelSizeFactor: e.target.value }));
+  }
+
   handleCancelTraining = () => {
     axios({
       method:'DELETE',
@@ -472,6 +477,7 @@ class App extends Component {
     let uploadedImages = this.state.uploadedImagesPrediction;
     let model = this.state.model;
     let label = this.state.labelPrediction;
+    let kernelSizeFactor = this.state.kernelSizeFactor;
     
     if (method === ""){
       this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please first choose the method."}));
@@ -479,6 +485,14 @@ class App extends Component {
     }
     if (method === "famnet" && this.state.images.length == 0){
       this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please upload images and annotate them."}));
+      return;
+    }
+    if (method === "famnet" && kernelSizeFactor == null){
+      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please enter non-maxima suppression kernel size factor."}));
+      return;
+    }
+    if (method === "famnet" && (kernelSizeFactor > 1 || kernelSizeFactor <= 0)){
+      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please enter non-maxima suppression kernel size factor between 0 and 1."}));
       return;
     }
     if (uploadedImages.length == 0 && method !== "famnet"){
@@ -525,7 +539,7 @@ class App extends Component {
         axios({
           method:'POST',
           url:'/predict/famnet',
-          data: formData
+          data: {kernelSizeFactor: kernelSizeFactor}
         }).then(response => {
           this.setState(prevState => ({ ...prevState, alreadyPredicting: true, predictErrorMessage: "" }));
           this.checkPredicting(response.data.job_id);
@@ -558,7 +572,7 @@ class App extends Component {
   }
 
   handleReset = () => {
-    this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array(), alreadyPredicting: false, predictingFinished: false, labelPrediction: "", predictErrorMessage: "", detectionThreshold: null, predictedImage: "", result: new Array(), inferenceMethod: "" }));
+    this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array(), alreadyPredicting: false, predictingFinished: false, labelPrediction: "", predictErrorMessage: "", detectionThreshold: null, kernelSizeFactor: 0.7, predictedImage: "", result: new Array(), inferenceMethod: "" }));
   }
 
   handleSelectMethod = (e) => {
@@ -828,6 +842,7 @@ class App extends Component {
           onDeleteDataset={this.handleDeleteDatasetPrediction}
           onEnterLabel={this.handleEnterLabelPrediction}
           onEnterDetectionThreshold={this.handleEnterDetectionThreshold}
+          onEnterSizeFactor={this.handleEnterSizeFactor}
           onCancelPredicting={this.handleCancelPredicting}
           onPredict={this.handlePredict}
           onSelectedImage={this.handleSelectedImage}

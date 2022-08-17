@@ -13,6 +13,7 @@ const FormData = require('form-data');
 const PORT = process.env.PORT || 4000;
 const app = express();
 
+// const baseUrl = '192.168.178.41:4000';
 const baseUrl = 'http://localhost:4000';
 
 let currentlyTraining = false;
@@ -181,7 +182,7 @@ app.post('/predict', predUpload.array('images'), (req, res) => {
 
 app.post('/predict/famnet', (req, res) => {
   // with FamNet method we use training images and annotations saved on server
-  
+  let kernelSizeFactor = req.body.kernelSizeFactor;
   let annotations = new Array();
   
   // read all annotations files into annotations array
@@ -214,7 +215,7 @@ app.post('/predict/famnet', (req, res) => {
       });
     });
 
-    let a = {data: data, method: 'famnet'};
+    let a = {data: data, method: 'famnet', kernelSizeFactor: kernelSizeFactor};
 
     axios({
         method:'POST',

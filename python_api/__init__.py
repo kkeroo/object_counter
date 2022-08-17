@@ -212,13 +212,14 @@ class predictHandler(tornado.web.RequestHandler):
         annotations = []
         images = []
         annotations = data['data']
+        kernelSizeFactor = float(data['kernelSizeFactor'])
 
         for ann in annotations:
             image_name = ann['image_name']
             images.append(getImage(image_name))
 
-        print(f'Method: FamNet, Ann. lenght: {len(annotations)}, Imgs. lenght: {len(images)}')
-        job = q.enqueue(predict_famnet, job_timeout='24h', args=(images, annotations,))
+        print(f'Method: FamNet, Ann. lenght: {len(annotations)}, Imgs. lenght: {len(images)}, Kernel size factor: {kernelSizeFactor}')
+        job = q.enqueue(predict_famnet, job_timeout='24h', args=(images, annotations, kernelSizeFactor,))
         self.write({'message': 'success', 'job_id': job.id})
 
     def options(self, *args):

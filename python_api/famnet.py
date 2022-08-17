@@ -10,8 +10,7 @@ import torch.optim as optim
 from utils import MincountLoss, PerturbationLoss
 from tqdm import tqdm
 
-def predict_famnet(images, annotations):
-    print("as")
+def predict_famnet(images, annotations, kernel_size_factor):
     result = []
     gpu_id = -1
     model_path = './data/pretrainedModels/FamNet_Save1.pth'
@@ -106,9 +105,9 @@ def predict_famnet(images, annotations):
         print('===> The predicted count is: {:6.2f}'.format(output.sum().item()))
 
         rslt_file = "{}/{}".format('./predictions', image_name)
-        visualize_output_and_save(image.detach().cpu(), output.detach().cpu(), boxes.cpu(), rslt_file)
+        visualize_output_and_save(image.detach().cpu(), output.detach().cpu(), boxes.cpu(), rslt_file, kernel_size_factor)
         print("===> Visualized output is saved to {}".format(rslt_file))
-        result.append({'image': image_name, 'count': output.sum().item()})
+        result.append({'image': image_name, 'count': int(output.sum().item())})
     return result
 
     

@@ -8,6 +8,7 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import numpy as np
 matplotlib.use('agg')
 
 
@@ -342,20 +343,26 @@ def scale_and_clip(val, scale_factor, min_val, max_val):
     new_val = min(new_val, max_val)
     return new_val
 
-# def nonmaxima_suppression(matrix):
-#     result = np.copy(matrix)
-#     print(np.max(result))
-#     print(np.min(result))
-#     for i in range(1, matrix.shape[0]-1):
-#         for j in range(1,matrix.shape[1]-1):
-#             ar = [matrix[i-1][j], matrix[i+1][j], matrix[i][j-1], matrix[i][j+1], matrix[i-1][j-1], matrix[i+1][j+1], matrix[i-1][j+1], matrix[i+1][j-1]]
-#             if np.max(ar) >= result[i][j]:
-#                 result[i][j] = 0
-#             else:
-#                 result[i][j] = 1
-#     return result          
+def nonmaxima_suppression(matrix, size):
+    xs = []
+    ys = []
 
-def visualize_output_and_save(input_, output, boxes, save_path, figsize=(20, 12), dots=None):
+    result = np.zeros((matrix.shape[0], matrix.shape[1]))
+
+    for i in range(size, result.shape[0]-size):
+        for j in range(size,result.shape[1]-size):
+            ar = []
+            for k in range(1, size+1):
+                ar.extend([matrix[i-k][j], matrix[i+k][j], matrix[i][j-k], matrix[i][j+k], matrix[i-k][j-k], matrix[i+k][j+k], matrix[i-k][j+k], matrix[i+k][j-k]])
+            if np.max(ar) < matrix[i][j]:
+                result[i][j] = 1
+                xs.append(j)
+                ys.append(i)
+
+    print(f'No. of objects after NMS: {len(xs)}')
+    return result, xs, ys
+
+def visualize_output_and_save(input_, output, boxes, save_path, kernel_size_factor, figsize=(20, 12), dots=None):
     """
         dots: Nx2 numpy array for the ground truth locations of the dot annotation
             if dots is None, this information is not available
@@ -365,19 +372,35 @@ def visualize_output_and_save(input_, output, boxes, save_path, figsize=(20, 12)
     pred_cnt = output.sum().item()
     boxes = boxes.squeeze(0)
 
+    avg_size = 0
+
+    if kernel_size_factor > 1 or kernel_size_factor <= 0:
+        kernel_size_factor = 0.7
+
     boxes2 = []
     for i in range(0, boxes.shape[0]):
         y1, x1, y2, x2 = int(boxes[i, 1].item()), int(boxes[i, 2].item()), int(boxes[i, 3].item()), int(
             boxes[i, 4].item())
+        width = x2 - x1
+        height = y2 - y1
+        avg_size_box = (width + height) / 2
+        avg_size += avg_size_box
+        print(f'[Bounding box {i}] Width: {width}, height: {height}, avg size: {avg_size_box}')
         roi_cnt = output[0,0,y1:y2, x1:x2].sum().item()
         boxes2.append([y1, x1, y2, x2, roi_cnt])
 
+    avg_size /= boxes.shape[0]
+    print(f'Total avg size: {avg_size}')
+    kernel_size = max(8, int(kernel_size_factor*avg_size))
+    print(f'Kernel size: {kernel_size}')
     img1 = format_for_plotting(denormalize(input_))
     output = format_for_plotting(output)
 
-    # print(np.sum(output.cpu().detach().numpy()))
-    # output = nonmaxima_suppression(output.cpu().detach().numpy())
-    # print(np.sum(output))
+    mapa = output.cpu().detach().numpy()
+    # mapa = mapa[25:60, 70:100]
+    res, xs, ys = nonmaxima_suppression(mapa, kernel_size)
+
+    object_count = len(xs)
 
     fig = plt.figure(figsize=figsize)
 
@@ -385,6 +408,7 @@ def visualize_output_and_save(input_, output, boxes, save_path, figsize=(20, 12)
     ax = fig.add_subplot(2, 2, 1)
     ax.set_axis_off()
     ax.imshow(img1)
+    ax.scatter(xs, ys, marker='x', s=16, c="red")
 
     for bbox in boxes2:
         y1, x1, y2, x2 = bbox[0], bbox[1], bbox[2], bbox[3]
@@ -433,6 +457,8 @@ def visualize_output_and_save(input_, output, boxes, save_path, figsize=(20, 12)
 
     fig.savefig(save_path, bbox_inches="tight")
     plt.close()
+
+    return object_count
 
 
 def format_for_plotting(tensor):

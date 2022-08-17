@@ -27,6 +27,10 @@ const Predict = (props) => {
                     <Form.Control required type="file" hidden={props.method == 'famnet'} disabled={props.alreadyPredicting} multiple accept="image/jpg, image/png" onChange={e => { props.onImageSelected(e) }}/>
 
                     {/* Used only with FamNet */}
+                    <Form.Label hidden={props.method != "famnet"} className="mt-2">NMS kernel size factor</Form.Label>
+                    <Form.Control type="number" hidden={props.method != "famnet"} disabled={props.alreadyPredicting} min="0" max="1" defaultValue={0.7} step="0.1" onChange={e => {props.onEnterSizeFactor(e)}} placeholder="Enter Non-maxima suppression kernel size factor"/>
+
+                    <Form.Text hidden={props.method != 'famnet'}>HINT: Use values closer to 0 (e.g. 0.3) for objects closer together and values closer to 1 for distant objects.<br></br></Form.Text>
                     <Form.Text hidden={props.method != 'famnet'}><br></br>For FamNet method images with annotations are used.<br></br></Form.Text>
 
                     {/* Used only for custom method */}

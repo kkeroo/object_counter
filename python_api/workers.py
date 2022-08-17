@@ -20,8 +20,8 @@ def predict(model_path, images, detection_threshold, label):
 def predict_faster_rcnn(images, detection_threshold, label):
     return inference_faster_rcnn(images, detection_threshold, label)
 
-def predict_famnet(images, annotations):
-    return pred_famnet(images, annotations)
+def predict_famnet(images, annotations, kernelSizeFactor):
+    return pred_famnet(images, annotations, kernelSizeFactor)
 
 # if __name__ == '__main__':
     # images = glob.glob('/Users/jasa/Downloads/guns/Images/*.jpeg')
