@@ -343,21 +343,36 @@ def scale_and_clip(val, scale_factor, min_val, max_val):
     new_val = min(new_val, max_val)
     return new_val
 
+def expand_edges(matrix, size):
+    result = np.copy(matrix)
+    w = matrix.shape[1]
+    h = matrix.shape[0]
+    rows = np.zeros((size, w))
+    result = np.r_[rows, result, rows]
+
+    h = h + 2 * size
+
+    cols = np.zeros((h, size))
+    result = np.c_[cols, result, cols]
+    return result
+
 def nonmaxima_suppression(matrix, size):
     xs = []
     ys = []
 
     result = np.zeros((matrix.shape[0], matrix.shape[1]))
 
-    for i in range(size, result.shape[0]-size):
-        for j in range(size,result.shape[1]-size):
+    matrix = expand_edges(matrix, size)
+
+    for i in range(size, matrix.shape[0]-size):
+        for j in range(size, matrix.shape[1]-size):
             ar = []
             for k in range(1, size+1):
                 ar.extend([matrix[i-k][j], matrix[i+k][j], matrix[i][j-k], matrix[i][j+k], matrix[i-k][j-k], matrix[i+k][j+k], matrix[i-k][j+k], matrix[i+k][j-k]])
             if np.max(ar) < matrix[i][j]:
-                result[i][j] = 1
-                xs.append(j)
-                ys.append(i)
+                result[i-size][j-size] = 1
+                xs.append(j-size)
+                ys.append(i-size)
 
     print(f'No. of objects after NMS: {len(xs)}')
     return result, xs, ys
