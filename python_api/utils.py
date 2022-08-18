@@ -422,11 +422,11 @@ def visualize_output_and_save(input_, output, boxes, save_path, kernel_size_fact
         # ax.scatter(dots[:,0], dots[:,1], c='black', marker='+')
         ax.set_title("Input image, gt count: {}".format(dots.shape[0]))
     else:
-        ax.set_title("Input image")
+        ax.set_title(f"Input image, count after NMS: {object_count}")
 
     ax = fig.add_subplot(2, 2, 2)
     ax.set_axis_off()
-    ax.set_title("Overlaid result, predicted count: {:.2f}".format(pred_cnt))
+    ax.set_title("Overlaid result")
 
     img2 = 0.2989*img1[:,:,0] + 0.5870*img1[:,:,1] + 0.1140*img1[:,:,2]
     ax.imshow(img2, cmap='gray')
@@ -436,13 +436,13 @@ def visualize_output_and_save(input_, output, boxes, save_path, kernel_size_fact
     # display the density map
     ax = fig.add_subplot(2, 2, 3)
     ax.set_axis_off()
-    ax.set_title("Density map, predicted count: {:.2f}".format(pred_cnt))
+    ax.set_title("Density map, sum over density values: {:.2f}".format(pred_cnt))
     ax.imshow(output)
     # plt.colorbar()
 
     ax = fig.add_subplot(2, 2, 4)
     ax.set_axis_off()
-    ax.set_title("Density map, predicted count: {:.2f}".format(pred_cnt))
+    ax.set_title("Density map, sum over density values: {:.2f}".format(pred_cnt))
     ret_fig = ax.imshow(output)
     for bbox in boxes2:
         y1, x1, y2, x2, roi_cnt = bbox[0], bbox[1], bbox[2], bbox[3], bbox[4]

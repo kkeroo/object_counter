@@ -105,9 +105,9 @@ def predict_famnet(images, annotations, kernel_size_factor):
         print('===> The predicted count is: {:6.2f}'.format(output.sum().item()))
 
         rslt_file = "{}/{}".format('./predictions', image_name)
-        visualize_output_and_save(image.detach().cpu(), output.detach().cpu(), boxes.cpu(), rslt_file, kernel_size_factor)
+        object_count = visualize_output_and_save(image.detach().cpu(), output.detach().cpu(), boxes.cpu(), rslt_file, kernel_size_factor)
         print("===> Visualized output is saved to {}".format(rslt_file))
-        result.append({'image': image_name, 'count': int(output.sum().item())})
+        result.append({'image': image_name, 'count': object_count})
     return result
 
     

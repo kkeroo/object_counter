@@ -22,6 +22,7 @@ const Predict = (props) => {
                     </select>
 
                     <Form.Label className="mt-2">Images for prediction</Form.Label>
+                    <Form.Text hidden={props.method != 'famnet'}><br></br>For FamNet method images with annotations are used.<br></br></Form.Text>
                     
                     {/* Used with every method but FamNet */}
                     <Form.Control required type="file" hidden={props.method == 'famnet'} disabled={props.alreadyPredicting} multiple accept="image/jpg, image/png" onChange={e => { props.onImageSelected(e) }}/>
@@ -31,7 +32,6 @@ const Predict = (props) => {
                     <Form.Control type="number" hidden={props.method != "famnet"} disabled={props.alreadyPredicting} min="0" max="1" defaultValue={0.7} step="0.1" onChange={e => {props.onEnterSizeFactor(e)}} placeholder="Enter Non-maxima suppression kernel size factor"/>
 
                     <Form.Text hidden={props.method != 'famnet'}>HINT: Use values closer to 0 (e.g. 0.3) for objects closer together and values closer to 1 for distant objects.<br></br></Form.Text>
-                    <Form.Text hidden={props.method != 'famnet'}><br></br>For FamNet method images with annotations are used.<br></br></Form.Text>
 
                     {/* Used only for custom method */}
                     <Form.Label className="mt-2" hidden={props.method !== 'custom'}>Label</Form.Label>
