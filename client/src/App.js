@@ -572,7 +572,8 @@ class App extends Component {
   }
 
   handleReset = () => {
-    this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array(), alreadyPredicting: false, predictingFinished: false, labelPrediction: "", predictErrorMessage: "", detectionThreshold: null, kernelSizeFactor: 0.7, predictedImage: "", result: new Array(), inferenceMethod: "" }));
+    // this.setState(prevState => ({ ...prevState, uploadedImagesPrediction: new Array(), alreadyPredicting: false, predictingFinished: false, labelPrediction: "", predictErrorMessage: "", detectionThreshold: null, kernelSizeFactor: 0.7, predictedImage: "", result: new Array(), inferenceMethod: "" }));
+    window.location.reload();
   }
 
   handleSelectMethod = (e) => {
