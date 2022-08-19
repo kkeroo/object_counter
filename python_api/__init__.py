@@ -175,6 +175,16 @@ class predictHandler(tornado.web.RequestHandler):
     def post(self):
         data = json_decode(self.request.body)
         method = data['method']
+
+        folder = './predictions'
+        for filename in os.listdir(folder):
+            filepath = os.path.join(folder, filename)
+            try:
+                if os.path.isfile(filepath) or os.path.islink(filepath):
+                    os.unlink(filepath)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (filepath, e))
+
         if method == 'famnet':
             self.famnet_predict()
         else:
@@ -187,15 +197,6 @@ class predictHandler(tornado.web.RequestHandler):
 
             for img in images:
                 pred_images.append({'image': getPredImage(img), 'name': img})
-
-            folder = './predictions'
-            for filename in os.listdir(folder):
-                filepath = os.path.join(folder, filename)
-                try:
-                    if os.path.isfile(filepath) or os.path.islink(filepath):
-                        os.unlink(filepath)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' % (filepath, e))
 
             if method == 'custom':
                 model = data['model']
