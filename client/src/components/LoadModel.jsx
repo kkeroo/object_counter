@@ -21,13 +21,13 @@ const LoadModel = (props) => {
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="danger" onClick={props.onDeleteModel} hidden={props.model == null}>
+                <Button name='delete_btn' variant="danger" onClick={props.onDeleteModel} hidden={props.model == null}>
                     Delete
                 </Button>
-                <Button variant="secondary" onClick={props.onClose}>
+                <Button name='close_btn' variant="secondary" onClick={props.onClose}>
                     Close
                 </Button>
-                <Button variant="primary" onClick={props.onUploadModel} hidden={props.model != null} disabled={props.uploadingModel}>
+                <Button name='upload_btn' variant="primary" onClick={props.onUploadModel} hidden={props.model != null} disabled={props.uploadingModel}>
                     {props.uploadingModel ? "Uploading..." : "Upload"}
                 </Button>
             </Modal.Footer>

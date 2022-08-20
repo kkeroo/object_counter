@@ -26,11 +26,11 @@ const Train = (props) => {
 
                     {/* <p className="text-danger mt-1">Please enter valid model name</p> */}
                     {/* <Form.Check disabled={props.alreadyTraining} type="checkbox" className="mt-3" onClick={() => {props.onTrainTestSplit()}} label="Train-Test split (70-30 split)"/> */}
-                    <Button variant="success" className="mt-3" onClick={() => {props.onTrain()}} disabled={props.alreadyTraining}>
+                    <Button name='train_btn' variant="success" className="mt-3" onClick={() => {props.onTrain()}} disabled={props.alreadyTraining}>
                         <div hidden={!props.alreadyTraining} className="spinner-border spinner-border-sm me-2" role="status"></div>
                         {props.alreadyTraining ? "Training..." : "Train"}
                     </Button>
-                    <Button hidden={!props.alreadyTraining} onClick={() => {props.onCancelTraining()}} variant="danger mt-3 ms-3">Cancel training</Button>
+                    <Button name='cancel_btn' hidden={!props.alreadyTraining} onClick={() => {props.onCancelTraining()}} variant="danger mt-3 ms-3">Cancel training</Button>
                 </Col>
                 <Col></Col>
             </Row>
@@ -41,7 +41,7 @@ const Train = (props) => {
                     <p>Train loss: {props.train_loss} |
                     Validation loss: {props.valid_loss}
                     </p>
-                    <Button href="http://localhost:8888/" download="model.pt" variant="success" className="mt-2">
+                    <Button name='donwload_btn' href="http://localhost:8888/" download="model.pt" variant="success" className="mt-2">
                         Download model
                     </Button>
                 </Col>

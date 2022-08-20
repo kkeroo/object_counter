@@ -45,3 +45,9 @@
 .start-btn {
   width: 100%;
 }
+
+@media (min-width:801px) {
+  .slika {
+    margin-bottom: 5px;
+  }
+}

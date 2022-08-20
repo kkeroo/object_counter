@@ -60,11 +60,11 @@ const Predict = (props) => {
                         {props.errorMessage}
                     </div>
 
-                    <Button variant="success" className="mt-3" onClick={() => {props.onPredict()}} disabled={props.alreadyPredicting}>
+                    <Button name='predict_btn' variant="success" className="mt-3" onClick={() => {props.onPredict()}} disabled={props.alreadyPredicting}>
                         <div hidden={!props.alreadyPredicting} className="spinner-border spinner-border-sm me-2" role="status"></div>
                         {props.alreadyPredicting ? "Predicting..." : "Predict"}
                     </Button>
-                    <Button hidden={!props.alreadyPredicting} onClick={() => {props.onCancelPredicting()}} variant="danger mt-3 ms-3">Cancel predicting</Button>
+                    <Button name='cancel_btn' hidden={!props.alreadyPredicting} onClick={() => {props.onCancelPredicting()}} variant="danger mt-3 ms-3">Cancel predicting</Button>
                 </Col>
                 <Col></Col>
             </Row>
@@ -73,6 +73,7 @@ const Predict = (props) => {
                 <Col lg="9">
                     <div className="predict-img-container mt-4 me-5">
                         <img
+                        alt='Preview image'
                         className="predict-img"
                         // crossorigin="anonymous"
                         src={props.predictedImage.path}

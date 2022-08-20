@@ -21,13 +21,13 @@ const LoadDataset = (props) => {
             </div>
         </Modal.Body>
         <Modal.Footer>
-            <Button variant="danger" onClick={props.onDeleteDataset} hidden={props.image_lenght == 0}>
+            <Button name='delete_btn' variant="danger" onClick={props.onDeleteDataset} hidden={props.image_lenght == 0}>
                 Delete
             </Button>
-            <Button variant="secondary" onClick={props.onClose}>
+            <Button name='close_btn' variant="secondary" onClick={props.onClose}>
                 Close
             </Button>
-            <Button variant="primary" onClick={props.onServerUpload} hidden={props.image_lenght > 0} disabled={props.uploadingImages}>
+            <Button name='upload_btn' variant="primary" onClick={props.onServerUpload} hidden={props.image_lenght > 0} disabled={props.uploadingImages}>
                 {props.uploadingImages ? "Uploading..." : "Upload"}
             </Button>
         </Modal.Footer>

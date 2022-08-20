@@ -746,6 +746,7 @@ class App extends Component {
             <Col lg="9" className="image-col">
               <div className="img-container mt-3 me-4">
                 <img
+                  alt='Selected image'
                   ref={this.imgRef}
                   className="slika"
                   crossOrigin="anonymous"
@@ -758,27 +759,27 @@ class App extends Component {
             <Col lg="3" className="toolbox">
 
               <Stack direction='horizontal' gap="2" className="ms-5 me-5 mt-3">
-                  <Button variant="success" className="me-auto ms-auto start-btn" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.name == ""}>
+                  <Button aria-label='start_btn' variant="success" className="me-auto ms-auto start-btn" onClick = {() => this.showMarkerArea()} disabled={this.state.editing || this.state.currImage.name == ""}>
                     Start
                   </Button>
-                  <Button className="btn-danger ms-auto me-auto finish-btn" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
+                  <Button aria-label='finish_btn' className="btn-danger ms-auto me-auto finish-btn" onClick={() => { this.finishEditing(); }} disabled={!this.state.editing}>Finish</Button>
               </Stack>
 
               <Stack direction="horizontal" gap="3" className="ms-2 me-2 mt-3">
-                <Button variant="primary" className="me-auto ms-auto" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>
+                <Button aria-label='marker_btn' variant="primary" className="me-auto ms-auto" onClick={() => { this.markerArea.createNewMarker(markerjs2.FrameMarker); }} disabled={!this.state.editing}>
                   <i className="bi bi-plus-square"></i>
                 </Button>
-                <Button variant="secondary" className="me-auto ms-auto" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>
+                <Button aria-label='deselect_btn' variant="secondary" className="me-auto ms-auto" onClick={() => { this.markerArea.setCurrentMarker(); }} disabled={!this.state.editing}>
                   <i className="bi bi-cursor"></i>
                   </Button>
                 <input type="checkbox" className="btn-check ms-auto me-auto" id="btn-check-2-outlined" onChange={e => {this.toggleInstantAnottations(e)}} disabled={!this.state.editing} />
                 <label className="btn btn-outline-secondary ms-auto me-auto" htmlFor="btn-check-2-outlined">
                   <i className="bi bi-lightning"></i>
                 </label>
-                <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomIn(); }} disabled={!this.state.editing}>
+                <Button aria-label='zoomIn_btn' variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomIn(); }} disabled={!this.state.editing}>
                   <i className="bi bi-zoom-in"></i>
                 </Button>
-                <Button variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomOut(); }} disabled={!this.state.editing}>
+                <Button aria-label='zoomOut_btn' variant="warning" className="me-auto ms-auto" onClick={() => { this.zoomOut(); }} disabled={!this.state.editing}>
                   <i className="bi bi-zoom-out"></i>
                 </Button>
               </Stack>
