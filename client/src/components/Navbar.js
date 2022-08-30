@@ -18,7 +18,7 @@ function Navigation(props){
                         <Nav.Link href="#1" onClick={() => {props.onAnnotate()}} active={props.page === "annotate"}>Annotate</Nav.Link>
                         <Nav.Link href="#3" onClick={() => {props.onLoadModel()}} active={false}>Load model</Nav.Link>
                         <Nav.Link href="#4" onClick={() => {props.onTrainModel()}} active={props.page === "train"}>Train</Nav.Link>
-                        <Nav.Link href="#5" onClick={() => {props.onPredict()}} active={props.page === "predict"}>Predict</Nav.Link>
+                        <Nav.Link href="#5" onClick={() => {props.onPredict()}} active={props.page === "predict"}>Count</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

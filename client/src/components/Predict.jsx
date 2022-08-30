@@ -21,7 +21,7 @@ const Predict = (props) => {
                         <option value="famnet">FamNet model</option>
                     </select>
 
-                    <Form.Label className="mt-2">Images for prediction</Form.Label>
+                    <Form.Label className="mt-2">Images for counting</Form.Label>
                     <Form.Text hidden={props.method != 'famnet'}><br></br>For FamNet method images with annotations are used.<br></br></Form.Text>
                     
                     {/* Used with every method but FamNet */}
@@ -62,7 +62,7 @@ const Predict = (props) => {
 
                     <Button name='predict_btn' variant="success" className="mt-3" onClick={() => {props.onPredict()}} disabled={props.alreadyPredicting}>
                         <div hidden={!props.alreadyPredicting} className="spinner-border spinner-border-sm me-2" role="status"></div>
-                        {props.alreadyPredicting ? "Predicting..." : "Predict"}
+                        {props.alreadyPredicting ? "Counting..." : "Count"}
                     </Button>
                     <Button name='cancel_btn' hidden={!props.alreadyPredicting} onClick={() => {props.onCancelPredicting()}} variant="danger mt-3 ms-3">Cancel predicting</Button>
                 </Col>
