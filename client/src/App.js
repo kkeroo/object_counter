@@ -17,8 +17,8 @@ import Train from './components/Train';
 import LoadModel from './components/LoadModel';
 import Predict from './components/Predict';
 
-// let baseUrl = 'http://localhost';
-let baseUrl = 'http://192.168.178.41';
+let baseUrl = 'http://localhost';
+// let baseUrl = 'http://192.168.178.41';
 
 class App extends Component {
   constructor(props){

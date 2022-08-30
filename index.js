@@ -13,8 +13,8 @@ const FormData = require('form-data');
 const PORT = process.env.PORT || 4000;
 const app = express();
 
-const baseUrl = 'http://192.168.178.41:4000';
-// const baseUrl = 'http://localhost:4000';
+// const baseUrl = 'http://192.168.178.41:4000';
+const baseUrl = 'http://localhost:4000';
 
 let currentlyTraining = false;
 let currentlyPredicting = false;
