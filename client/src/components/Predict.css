@@ -1,4 +1,4 @@
-.predict-img-container{
+/* .predict-img-container{
     margin-top: 30px;
     left:auto;
     height: 85vh;
@@ -8,4 +8,10 @@
     width:100%;
     height:100%;
     object-fit: contain;
-}
+} */
+
+@media (min-width:801px) {
+    .predict-img {
+      margin-bottom: 5px;
+    }
+  }

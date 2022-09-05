@@ -370,7 +370,8 @@ def nonmaxima_suppression(matrix, size):
             for k in range(1, size+1):
                 ar.extend([matrix[i-k][j], matrix[i+k][j], matrix[i][j-k], matrix[i][j+k], matrix[i-k][j-k], matrix[i+k][j+k], matrix[i-k][j+k], matrix[i+k][j-k]])
             if np.max(ar) < matrix[i][j]:
-                result[i-size][j-size] = 1
+                result[i-size][j-size] = 100
+                matrix[i][j] = 100
                 xs.append(j-size)
                 ys.append(i-size)
 
@@ -470,10 +471,10 @@ def visualize_output_and_save(input_, output, boxes, save_path, kernel_size_fact
 
     fig.colorbar(ret_fig, ax=ax)
 
-    fig.savefig(save_path, bbox_inches="tight")
+    # fig.savefig(save_path, bbox_inches="tight")
     plt.close()
 
-    return object_count
+    return object_count, xs, ys
 
 
 def format_for_plotting(tensor):

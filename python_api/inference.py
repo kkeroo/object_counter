@@ -66,10 +66,12 @@ def inference_faster_rcnn(images, detection_threshold, label):
             boxes = boxes[scores >= detection_threshold].astype(np.int32)
             draw_boxes = boxes.copy()
 
+            anns = []
             # draw the bounding boxes and write the class name on top of it
             for j, box in enumerate(draw_boxes):
                 if pred_classes[j] == label:
                     counter += 1
+                    anns.append([int(box[0]), int(box[1]), int(box[2]), int(box[3])])
                     cv2.rectangle(orig_image,
                                 (int(box[0]), int(box[1])),
                                 (int(box[2]), int(box[3])),
@@ -78,8 +80,8 @@ def inference_faster_rcnn(images, detection_threshold, label):
                                 (int(box[0]), int(box[1]-5)),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 
                                 2, lineType=cv2.LINE_AA)
-            cv2.imwrite(f"./predictions/{images[i]['name']}", orig_image,)
-            predictions.append({'image': images[i]['name'], 'count': counter})
+            # cv2.imwrite(f"./predictions/{images[i]['name']}", orig_image,)
+            predictions.append({'image': images[i]['name'], 'count': counter, 'annotations': anns})
         print(f"Image {i+1} done...")
         print(f'{label}\'s count: {counter}')
         print('-'*50)
@@ -129,7 +131,9 @@ def inference(model_path, images, detection_threshold, classes):
             pred_classes = [classes[i] for i in outputs[0]['labels'].cpu().numpy()]
             
             # draw the bounding boxes and write the class name on top of it
+            anns = []
             for j, box in enumerate(draw_boxes):
+                anns.append([int(box[0]), int(box[1]), int(box[2]), int(box[3])])
                 cv2.rectangle(orig_image,
                             (int(box[0]), int(box[1])),
                             (int(box[2]), int(box[3])),
@@ -140,8 +144,8 @@ def inference(model_path, images, detection_threshold, classes):
                             2, lineType=cv2.LINE_AA)
             # cv2.imwrite(f"./predictions/{os.path.basename(test_images[i])}", orig_image,)
             # predictions.append({'image': os.path.basename(test_images[i]), 'count': len(draw_boxes)})
-            cv2.imwrite(f"./predictions/{test_images[i]['name']}", orig_image,)
-            predictions.append({'image': test_images[i]['name'], 'count': len(draw_boxes)})
+            # cv2.imwrite(f"./predictions/{test_images[i]['name']}", orig_image,)
+            predictions.append({'image': test_images[i]['name'], 'count': len(draw_boxes), 'annotations': anns})
 
         print(f"Image {i+1} done...")
         print('-'*50)

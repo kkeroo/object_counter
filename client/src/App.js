@@ -339,7 +339,8 @@ class App extends Component {
         let result = response.data.result; // [{image: , count: },...]
         let data = [];
         result.forEach(r => {
-          data.push({ name: r.image, path: baseUrl + ":8888/images/"+r.image, count: this.state.method === 'famnet' ? parseFloat(r.count).toFixed(4) : r.count });
+          // data.push({ name: r.image, path: baseUrl + ":8888/images/"+r.image, count: this.state.method === 'famnet' ? parseFloat(r.count).toFixed(4) : r.count , annotations: r.annotations});
+          data.push({ name: r.image, path: this.state.inferenceMethod === "famnet" ? baseUrl + ":4000/images/"+r.image : baseUrl + ":4000/images/prediction/"+r.image, count: this.state.method === 'famnet' ? parseFloat(r.count).toFixed(4) : r.count , annotations: r.annotations, xs: r.xs, ys: r.ys});
         });
         this.setState(prevState => ({ ...prevState, alreadyPredicting:false, predictingFinished: true, result: data, predictedImage: data[0] }));
       }
@@ -472,6 +473,8 @@ class App extends Component {
   handlePredict = () => {
     if (this.state.alreadyPredicting) return
 
+    this.setState(prevState => ({ ...prevState, alreadyPredicting: true }));
+
     let method = this.state.inferenceMethod;
     let threshold = this.state.detectionThreshold;
     let uploadedImages = this.state.uploadedImagesPrediction;
@@ -480,36 +483,36 @@ class App extends Component {
     let kernelSizeFactor = this.state.kernelSizeFactor;
     
     if (method === ""){
-      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please first choose the method."}));
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictErrorMessage: "Please first choose the method."}));
       return;
     }
     if (method === "famnet" && this.state.images.length == 0){
-      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please upload images and annotate them."}));
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictErrorMessage: "Please upload images and annotate them."}));
       return;
     }
     if (method === "famnet" && kernelSizeFactor == null){
-      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please enter non-maxima suppression kernel size factor."}));
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictErrorMessage: "Please enter non-maxima suppression kernel size factor."}));
       return;
     }
     if (method === "famnet" && (kernelSizeFactor > 1 || kernelSizeFactor <= 0)){
-      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please enter non-maxima suppression kernel size factor between 0 and 1."}));
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictErrorMessage: "Please enter non-maxima suppression kernel size factor between 0 and 1."}));
       return;
     }
     if (uploadedImages.length == 0 && method !== "famnet"){
-      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please upload images."}));
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictErrorMessage: "Please upload images."}));
       return;
     }
 
     if ((threshold < 0 || threshold > 1 || threshold == null) && method !== "famnet") {
-      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please choose value of detection threshold between 0 and 1."}));
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictErrorMessage: "Please choose value of detection threshold between 0 and 1."}));
       return;
     }
     if (model == null && method === "custom"){
-      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please upload model."}));
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictErrorMessage: "Please upload model."}));
       return;
     }
-    if (label == "" && method !== "famnet"){
-      this.setState(prevState => ({ ...prevState, predictErrorMessage: "Please enter label of object"}));
+    if (label == "" && method === "faster_rcnn"){
+      this.setState(prevState => ({ ...prevState, alreadyPredicting: false, predictErrorMessage: "Please enter label of object"}));
       return;
     }
     
