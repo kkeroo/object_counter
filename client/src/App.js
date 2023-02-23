@@ -65,6 +65,7 @@ class App extends Component {
     this.markerArea = null;
     this.interval = null;
     this.intervalPred = null;
+    this.zoomStep = 0.05;
     this.coco_names = [
       'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
       'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign',
@@ -657,6 +658,63 @@ class App extends Component {
     });
   }
 
+  handleWheel = (e) => {
+    const contentDiv = this.markerArea.contentDiv;
+    if (!contentDiv) {
+      console.log('error')
+    }
+
+    const scrollOffset = [contentDiv.scrollLeft, contentDiv.scrollTop];
+    const scrollOffsetRatio = [
+      scrollOffset[0] / (contentDiv.scrollWidth - contentDiv.clientWidth),
+      scrollOffset[1] / (contentDiv.scrollHeight - contentDiv.clientHeight),
+    ].map((v) => (isNaN(v) ? 0.5 : v));
+
+    let delta = 0;
+    e.preventDefault();
+
+    if (e.deltaY) { // FireFox 17+ (IE9+, Chrome 31+?)
+      delta = e.deltaY;
+    }
+    else if (e.wheelDelta){
+      delta = -e.wheelDelta;
+    }
+
+    let currentStep = this.markerArea.zoomLevel;
+    if (delta < 0) {
+      if (currentStep < 5){
+        this.markerArea.zoomLevel += this.zoomStep;
+      }
+    }
+    else if (delta > 0) {
+      if (currentStep > 1){
+        this.markerArea.zoomLevel -= this.zoomStep;
+      }
+    }
+
+    const newScrollOffset = [
+      scrollOffsetRatio[0] *
+        (contentDiv.scrollWidth - contentDiv.clientWidth),
+      scrollOffsetRatio[1] *
+        (contentDiv.scrollHeight - contentDiv.clientHeight),
+    ];
+    contentDiv.scrollLeft = newScrollOffset[0];
+    contentDiv.scrollTop = newScrollOffset[1];
+  }
+  
+  changeGrip = (event) => {
+    event.marker.rotatorGrip.visual.innerHTML = '';
+    event.marker.rotatorGripLine.outerHTML = '';
+    event.marker.controlGrips.bottomCenter.visual.innerHTML = '<circle cx="5" cy="5" r="2" fill="transparent"></circle><circle cx="5" cy="5" r="2" fill="#333" fill-opacity="0.8"></circle>'
+    event.marker.controlGrips.bottomLeft.visual.innerHTML = '<circle cx="5" cy="5" r="2" fill="transparent"></circle><circle cx="5" cy="5" r="2" fill="#333" fill-opacity="0.8"></circle>'
+    event.marker.controlGrips.bottomRight.visual.innerHTML = '<circle cx="5" cy="5" r="2" fill="transparent"></circle><circle cx="5" cy="5" r="2" fill="#333" fill-opacity="0.8"></circle>'
+    event.marker.controlGrips.topCenter.visual.innerHTML = '<circle cx="5" cy="5" r="2" fill="transparent"></circle><circle cx="5" cy="5" r="2" fill="#333" fill-opacity="0.8"></circle>'
+    event.marker.controlGrips.topLeft.visual.innerHTML = '<circle cx="5" cy="5" r="2" fill="transparent"></circle><circle cx="5" cy="5" r="2" fill="#333" fill-opacity="0.8"></circle>'
+    event.marker.controlGrips.topRight.visual.innerHTML = '<circle cx="5" cy="5" r="2" fill="transparent"></circle><circle cx="5" cy="5" r="2" fill="#333" fill-opacity="0.8"></circle>'
+    event.marker.controlGrips.centerLeft.visual.innerHTML = '<circle cx="5" cy="5" r="2" fill="transparent"></circle><circle cx="5" cy="5" r="2" fill="#333" fill-opacity="0.8"></circle>'
+    event.marker.controlGrips.centerRight.visual.innerHTML = '<circle cx="5" cy="5" r="2" fill="transparent"></circle><circle cx="5" cy="5" r="2" fill="#333" fill-opacity="0.8"></circle>'
+  } 
+
   showMarkerArea() {
     if (this.imgRef.current !== null) {
       // create a marker.js MarkerArea
@@ -668,7 +726,6 @@ class App extends Component {
       this.markerArea.uiStyleSettings.toolbarHeight = 0;
       this.markerArea.uiStyleSettings.hideToolbar = true;
       this.markerArea.uiStyleSettings.hideBox = true;
-      this.markerArea.zoomSteps = [1, 1.5, 2, 2.5, 3];
       this.markerArea.uiStyleSettings.zoomButtonVisible = true;
       this.markerArea.settings.defaultStrokeWidth = 2;
       //this.markerArea.settings.displayMode = 'popup';
@@ -687,6 +744,7 @@ class App extends Component {
       });
 
       this.markerArea.addEventListener('markercreate', event => {
+        this.changeGrip(event);  // show custom scale grip and hide rotation grip
         if (this.state.toggleInstantAnottations){
           event.markerArea.createNewMarker(markerjs2.FrameMarker);
         }
@@ -695,6 +753,9 @@ class App extends Component {
       // launch marker.js
       this.setState(prevState => ({...prevState, editing: true}));
       this.markerArea.show();
+
+      // document.getElementsByClassName('__markerjs2_')[0].addEventListener('wheel', this.handleWheel);
+      this.markerArea.contentDiv.addEventListener('wheel', this.handleWheel);
     }
   }
 
