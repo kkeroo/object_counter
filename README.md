@@ -1,5 +1,8 @@
 # Object counter (Diploma thesis)
 
+### Diploma thesis
+Link: [Repository of University of Ljubljana](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=140247)
+
 ### Requirements
 - NodeJS
 - Python3
